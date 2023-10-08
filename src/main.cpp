@@ -1,8 +1,9 @@
-#include "../include/main.h"
+
+#include "../includes/main.h"
 
 int main(int argc, char *argv[]){
-	display welcome message
-	std::cout << "\n\n------------------------------------------------" << std::endl;
-	std::cout << "Welcome to the Crossword Anagram Puzzle Program" << std::endl;
-	std::cout << "------------------------------------------------\n\n" << std::endl;
+	Menu* start_menu = new Menu("start menue");
+	Gui* user_interface = new Gui();
+	user_interface->start_Drawing();
+	return 0;
 }
