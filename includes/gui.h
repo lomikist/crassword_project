@@ -5,12 +5,12 @@
 #include "menu.h"
 
 using namespace std;
-class Gui{
+class Gui
+{
 private:
     string active_state;
 public:
     Gui();
     ~Gui();
     void drawMenu(Menu *);
-    void start_Drawing();
 };
