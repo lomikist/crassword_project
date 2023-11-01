@@ -6,13 +6,16 @@
 using namespace std;
 
 Gui::Gui(){
-    cout << "** gui is now initialized **" << endl;
+    printw("** gui is now initialized **");
+    this->menu = new Menu();
+    this->board = new Board( 0, 0, 30, 30);
 }
 
 Gui::~Gui(){
 }
 
-void Gui::drawMenu(Menu* item){
+void Gui::drawMenu(){
+    Menu* item = this->menu;
     for(int i = 0; i < item->items.size(); i++ ){
         if( &item->items[i] == item->active_item ){
             printw("---->");
@@ -25,18 +28,35 @@ void Gui::drawMenu(Menu* item){
     }
 }
 
-void Gui::drawBoard(Board* item){
-   this->rectangle(0,0,20,50);
+void Gui::drawBoard(){
+   this->rectangle();
 }
 
-void Gui::rectangle(int y1, int x1, int y2, int x2)
-{
-    mvhline(y1, x1, 0, x2-x1);
-    mvhline(y2, x1, 0, x2-x1);
-    mvvline(y1, x1, 0, y2-y1);
-    mvvline(y1, x2, 0, y2-y1);
-    mvaddch(y1, x1, ACS_ULCORNER);
-    mvaddch(y2, x1, ACS_LLCORNER);
-    mvaddch(y1, x2, ACS_URCORNER);
-    mvaddch(y2, x2, ACS_LRCORNER);
+void Gui::rectangle() {
+    mvaddch(this->board->startPoint.second, this->board->startPoint.first, ACS_ULCORNER);
+    mvaddch(this->board->endPoint.second, this->board->startPoint.first, ACS_LLCORNER);
+    mvaddch(this->board->startPoint.second, this->board->endPoint.first, ACS_URCORNER);
+    mvaddch(this->board->endPoint.second, this->board->endPoint.first, ACS_LRCORNER);
+    this->drawVerticalLines();
+    this->drawHorizonatalLines();
+}
+
+void Gui::drawVerticalLines(){
+
+}
+
+void Gui::drawHorizonatalLines(){
+
+}
+
+void Gui::changeItem(int key){
+    // for down
+    if ( key == 1 && this->menu->active_item != &menu->items[menu->items.size() - 1] ) {
+        this->menu->active_item = this->menu->active_item + 1;
+    }
+    // for up
+    else if (key == 0 && this->menu->active_item != &menu->items[0])
+    {
+        this->menu->active_item = this->menu->active_item - 1;
+    }
 }

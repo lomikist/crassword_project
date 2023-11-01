@@ -11,6 +11,6 @@ public:
     vector<string> items;
     string* active_item;
     void change_item(int);
-    Menu(string);
+    Menu();
     ~Menu();
 };

@@ -10,10 +10,15 @@ class Gui
 {
 private:
     string active_state;
-    void rectangle(int y1 = 0, int x1 = 0, int y2 = 1, int x2 = 1);
+    Menu* menu;
+    Board* board;
+    void rectangle();
+    void drawVerticalLines();
+    void drawHorizonatalLines();
 public:
     Gui();
     ~Gui();
-    void drawMenu(Menu *);
-    void drawBoard(Board *);
+    void drawMenu();
+    void drawBoard();
+    void changeItem(int );
 };
