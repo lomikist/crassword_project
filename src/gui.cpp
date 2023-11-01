@@ -42,11 +42,16 @@ void Gui::rectangle() {
 }
 
 void Gui::drawVerticalLines(){
-
+    for(int i = 0; i < this->board->lineCount.second; i++){
+        mvvline(this->board->startPoint.second, this->board->startPoint.first + 2 * i, 0, this->board->lineCount.first);
+    }
 }
 
 void Gui::drawHorizonatalLines(){
-
+    for(int i = 0; i < this->board->lineCount.second; i++){
+        // last argument .second because for horizontal line we should print vertical coutn time. 
+        mvhline(this->board->startPoint.second + 2 * i, this->board->startPoint.first, 0, this->board->lineCount.second);
+    }
 }
 
 void Gui::changeItem(int key){
