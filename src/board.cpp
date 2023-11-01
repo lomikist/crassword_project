@@ -14,7 +14,7 @@ Board::Board(int x1, int y1, int x2, int y2 ) {
     // ------
     // |*|
     // horizontal
-    this->lineCount.first = ( this->endPoint.second - this->startPoint.second ) / 2;
+    this->lineCount.first = (int) ( this->endPoint.second - this->startPoint.second ) / 2;
     // vertical 
-    this->lineCount.second = ( this->endPoint.first - this->startPoint.first ) / 2;
+    this->lineCount.second = (int) ( this->endPoint.first - this->startPoint.first ) / 2;
 }
