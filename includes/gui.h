@@ -14,7 +14,8 @@ private:
     Board* board;
     void rectangle();
     void drawVerticalLines();
-    void drawHorizonatalLines();
+    void drawHorizontalLines();
+    void drawBoarders();
 public:
     Gui();
     ~Gui();

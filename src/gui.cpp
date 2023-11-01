@@ -6,9 +6,9 @@
 using namespace std;
 
 Gui::Gui(){
-    printw("** gui is now initialized **");
     this->menu = new Menu();
-    this->board = new Board( 0, 0, 30, 30);
+
+    this->board = new Board( 0, 0, 30,66);
 }
 
 Gui::~Gui(){
@@ -27,31 +27,52 @@ void Gui::drawMenu(){
         }
     }
 }
-
+/**
+ * function for drawing a board
+*/
 void Gui::drawBoard(){
-   this->rectangle();
+    this->drawVerticalLines();
+    this->drawHorizontalLines();
+    this->drawBoarders();
 }
 
-void Gui::rectangle() {
+/**
+ * function to draw vertical lines
+*/
+void Gui::drawVerticalLines(){
+    for(int i = 1; i < this->board->lineCount.second; i++){
+        // from +1 to -1 because this function for inner lines.
+        mvvline(this->board->startPoint.second + 1, this->board->startPoint.first + 2 * i, 0, this->board->endPoint.second - 1);
+    }
+}
+
+/**
+ * function to draw horizontal lines
+*/
+void Gui::drawHorizontalLines(){
+    for(int i = 1; i < this->board->lineCount.first; i++){
+        // last argument .second because for horizontal line we should print vertical coutn time. 
+        mvhline(this->board->startPoint.second + 2 * i, this->board->startPoint.first + 1, 0, this->board->endPoint.first - 1);
+    }
+}
+
+/**
+ * function to draw boarders
+*/
+void Gui::drawBoarders(){
+    // for vertical boarder
+    mvvline(this->board->startPoint.second, this->board->startPoint.first, 0, this->board->endPoint.second);
+    mvvline(this->board->startPoint.second, this->board->endPoint.first, 0, this->board->endPoint.second);
+    
+    // for horizontal boarder
+    mvhline(this->board->startPoint.second, this->board->startPoint.first, 0, this->board->endPoint.first);
+    mvhline(this->board->endPoint.second, this->board->startPoint.first, 0, this->board->endPoint.first);
+
+    // for corner symbols
     mvaddch(this->board->startPoint.second, this->board->startPoint.first, ACS_ULCORNER);
     mvaddch(this->board->endPoint.second, this->board->startPoint.first, ACS_LLCORNER);
     mvaddch(this->board->startPoint.second, this->board->endPoint.first, ACS_URCORNER);
     mvaddch(this->board->endPoint.second, this->board->endPoint.first, ACS_LRCORNER);
-    this->drawVerticalLines();
-    this->drawHorizonatalLines();
-}
-
-void Gui::drawVerticalLines(){
-    for(int i = 0; i < this->board->lineCount.second; i++){
-        mvvline(this->board->startPoint.second, this->board->startPoint.first + 2 * i, 0, this->board->lineCount.first);
-    }
-}
-
-void Gui::drawHorizonatalLines(){
-    for(int i = 0; i < this->board->lineCount.second; i++){
-        // last argument .second because for horizontal line we should print vertical coutn time. 
-        mvhline(this->board->startPoint.second + 2 * i, this->board->startPoint.first, 0, this->board->lineCount.second);
-    }
 }
 
 void Gui::changeItem(int key){
