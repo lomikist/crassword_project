@@ -1,16 +1,16 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <ncurses.h>
 #include "string.h"
 using namespace std;
 class Menu
 {
 private:
-    string name;
 public:
-    vector<string> items;
-    string* active_item;
-    void change_item(int);
-    Menu();
+    Menu(vector<string>);
     ~Menu();
+    WINDOW* mainWindow;
+    vector<string> startMenuItems;
+    string* startMenuActiveItem;
 };

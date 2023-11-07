@@ -2,87 +2,90 @@
 #include <menu.h>
 #include "gui.h"
 #include "board.h"
+#include <ncurses.h>
+#include <map>
+#include <functional>
 
 using namespace std;
 
 Gui::Gui(){
-    this->menu = new Menu();
+    int width = 60;
+    int height = 30; 
 
-    this->board = new Board( 0, 0, 30,66);
+    vector<string> menuOptions = {"start", "obout_us","exit","blya","mlya"};
+    // map<string, function< void() > > menuFunctionOptions;
+    //TODO: each option should have their own logic after entering a key.
+    // menuFunctionOptions["start"] = [this]() { this->startDrawBoadr(); };
+    // menuFunctionOptions["exit"] = [this]() { this->startDrawBoadr(); };
+    // menuFunctionOptions["obout_us"] = [this]() { this->startDrawBoadr(); };
+
+    this->startMenu = new Menu(menuOptions);
+    // (width, height) 
+    this->gameBoard = new Board(height, width);
 }
 
 Gui::~Gui(){
+
 }
 
-void Gui::drawMenu(){
-    Menu* item = this->menu;
-    for(int i = 0; i < item->items.size(); i++ ){
-        if( &item->items[i] == item->active_item ){
-            printw("---->");
-            printw (item->items[i].c_str());
-            printw ( "\n" );
-        }else { 
-            printw ( item->items[i].c_str());
-            printw ( "\n" );
+//
+int Gui::windowHeight;
+int Gui::windowWidth;
+
+// setting a board size after some events. 
+void Gui::adjustScreenSize(){
+    getmaxyx(stdscr, Gui::windowHeight, Gui::windowWidth);
+}
+
+void Gui::drawStartMenu(int height, int width){
+    int y = (Gui::windowHeight - height) / 2;
+    int x = (Gui::windowWidth - width) / 2;
+
+    auto *mainWindow = this->startMenu->mainWindow;
+    
+    mainWindow = newwin(height, width, y, x);
+    box(mainWindow, '#', '#');
+
+    for (int i = 0; i < this->startMenu->startMenuItems.size(); ++i) {
+        if ( &this->startMenu->startMenuItems[i] == this->startMenu->startMenuActiveItem ) {
+            mvwprintw(mainWindow, (i + 0.5) * height / this->startMenu->startMenuItems.size(), 2, "----->");
+            mvwprintw(mainWindow, (i + 0.5) * height / this->startMenu->startMenuItems.size(), 9, "%s", this->startMenu->startMenuActiveItem->c_str() );
+        } else {
+            mvwprintw(mainWindow, (i + 0.5) * height / this->startMenu->startMenuItems.size(), 2, "%s", this->startMenu->startMenuItems[i].c_str());
         }
     }
-}
-/**
- * function for drawing a board
-*/
-void Gui::drawBoard(){
-    this->drawVerticalLines();
-    this->drawHorizontalLines();
-    this->drawBoarders();
+    wrefresh(mainWindow);
 }
 
-/**
- * function to draw vertical lines
-*/
-void Gui::drawVerticalLines(){
-    for(int i = 1; i < this->board->lineCount.second; i++){
-        // from +1 to -1 because this function for inner lines.
-        mvvline(this->board->startPoint.second + 1, this->board->startPoint.first + 2 * i, 0, this->board->endPoint.second - 1);
-    }
-}
-
-/**
- * function to draw horizontal lines
-*/
-void Gui::drawHorizontalLines(){
-    for(int i = 1; i < this->board->lineCount.first; i++){
-        // last argument .second because for horizontal line we should print vertical coutn time. 
-        mvhline(this->board->startPoint.second + 2 * i, this->board->startPoint.first + 1, 0, this->board->endPoint.first - 1);
-    }
-}
-
-/**
- * function to draw boarders
-*/
-void Gui::drawBoarders(){
-    // for vertical boarder
-    mvvline(this->board->startPoint.second, this->board->startPoint.first, 0, this->board->endPoint.second);
-    mvvline(this->board->startPoint.second, this->board->endPoint.first, 0, this->board->endPoint.second);
-    
-    // for horizontal boarder
-    mvhline(this->board->startPoint.second, this->board->startPoint.first, 0, this->board->endPoint.first);
-    mvhline(this->board->endPoint.second, this->board->startPoint.first, 0, this->board->endPoint.first);
-
-    // for corner symbols
-    mvaddch(this->board->startPoint.second, this->board->startPoint.first, ACS_ULCORNER);
-    mvaddch(this->board->endPoint.second, this->board->startPoint.first, ACS_LLCORNER);
-    mvaddch(this->board->startPoint.second, this->board->endPoint.first, ACS_URCORNER);
-    mvaddch(this->board->endPoint.second, this->board->endPoint.first, ACS_LRCORNER);
-}
-
+// responsible for changing a menu active item. 
 void Gui::changeItem(int key){
     // for down
-    if ( key == 1 && this->menu->active_item != &menu->items[menu->items.size() - 1] ) {
-        this->menu->active_item = this->menu->active_item + 1;
+    if ( key == 1 && this->startMenu->startMenuActiveItem != &this->startMenu->startMenuItems[this->startMenu->startMenuItems.size() - 1] ) {
+        this->startMenu->startMenuActiveItem = this->startMenu->startMenuActiveItem + 1;
+    } else if (key == 0 && this->startMenu->startMenuActiveItem != &this->startMenu->startMenuItems[0]) {
+        // for up
+        this->startMenu->startMenuActiveItem = this->startMenu->startMenuActiveItem - 1;
     }
-    // for up
-    else if (key == 0 && this->menu->active_item != &menu->items[0])
-    {
-        this->menu->active_item = this->menu->active_item - 1;
+}
+
+void Gui::startDrawBoadr( vector < vector < char > > & table){
+    int y = (Gui::windowHeight - gameBoard->sizes.first) / 2;
+    int x = (Gui::windowWidth - gameBoard->sizes.second) / 2;
+
+    auto *mainWindow = this->gameBoard->mainWindow;
+    auto *inputWindow = this->gameBoard->inputWindow;
+
+    // initialaze game board
+    mainWindow = newwin(gameBoard->sizes.first, gameBoard->sizes.second, y, x);
+    //  initialzae input board      ! ( y + game...  becaues we should draw it below the board )
+    inputWindow = newwin(gameBoard->sizes.first / 5, gameBoard->sizes.second, y + gameBoard->sizes.first + 7, x);
+
+    box(mainWindow, 0, 0);
+    for (size_t i = 1; i < table.size(); ++i) {
+        for (size_t j = 1; j < table[i].size(); ++j) {
+            mvwaddch(mainWindow, j, i, table[i][j]);
+        }
     }
+    wrefresh(mainWindow);
+    wrefresh(inputWindow);
 }

@@ -9,17 +9,20 @@ using namespace std;
 class Gui
 {
 private:
-    string active_state;
-    Menu* menu;
-    Board* board;
-    void rectangle();
-    void drawVerticalLines();
-    void drawHorizontalLines();
-    void drawBoarders();
+
 public:
     Gui();
     ~Gui();
-    void drawMenu();
-    void drawBoard();
+    Menu* startMenu;
+    Board* gameBoard;
+    
     void changeItem(int );
+    
+    void startDrawBoadr(vector<vector<char>>& );
+    
+    void drawStartMenu(int,int);
+
+    static void adjustScreenSize();
+    static int windowHeight;
+    static int windowWidth;
 };

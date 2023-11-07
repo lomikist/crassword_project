@@ -8,10 +8,12 @@
 
 class Core{
 private:
-    string active_state;
+    // string active_state;
     Gui* user_interface;
 public:
-    Core();
+    Core(int = 30, int = 30);
     ~Core();
     void detecting_key();
+    void startGame();
+    vector<vector<char>> table;
 };
