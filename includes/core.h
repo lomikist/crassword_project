@@ -16,4 +16,6 @@ public:
     void detecting_key();
     void startGame();
     vector<vector<char>> table;
+
+    void getDecimal(int& );
 };
