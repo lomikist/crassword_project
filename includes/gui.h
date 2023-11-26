@@ -11,7 +11,7 @@ class Gui
 private:
 
 public:
-    Gui();
+    Gui(int, int);
     ~Gui();
     Menu* startMenu;
     Board* gameBoard;
@@ -25,4 +25,10 @@ public:
     static void adjustScreenSize();
     static int windowHeight;
     static int windowWidth;
+    void drawVerticalLines();
+    void drawHorizontalLines();
+
+    int detectConrtolKeys();
+    void clearScreen();
+    int getDecimalNumber();
 };

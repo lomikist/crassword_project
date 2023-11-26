@@ -2,93 +2,131 @@
 #include "../includes/gui.h"
 #include <map>
 #include <functional>
+#include <fstream>
+#include <iostream>
 
-Core::Core(int verCount, int horCount)
-{
+Core::Core(int verCount, int horCount) {
+    // this->model = new Model();
+
+    this->longestSize = 0;
+    this->longestIndex = 0;
+
     // board initialization 
-    for (size_t i = 0; i < verCount; ++i) {
+    for (size_t i = 0; i < verCount / 4; ++i) {
         vector<char> row;       
-        for (size_t j = 0; j < horCount; ++j) {
+        for (size_t j = 0; j < horCount / 4; ++j) {
             row.push_back(' ');
         }
         this->table.push_back(row);
     }
     
-    this->user_interface = new Gui();
-    this->detecting_key();
+    this->fillWords();
+    this->fillTable();
+    this->user_interface = new Gui( verCount, horCount );
 }
+
 Core::~Core()
 {
 }
 
-/**
- * Function for selecting which key is pressed depending on it draw board or menu.
- */
-void Core::detecting_key() {
+void Core::startGame(){
+
     initscr();
-    keypad(stdscr, TRUE);
+    keypad(stdscr, true);
 
-    int key;
-
-    printw("You can control with up and down arrows.");
-    Gui::adjustScreenSize();
-    // adjusting a window sizes.
+    this->user_interface->adjustScreenSize();
+    
+    int key = 0;
     do {
-        key = getch();
-        // if pressed button is not enter
-        if (key != 10 ) {
-            if (key == KEY_UP) {
-                // For changing a pointer selection to one level up
-                this->user_interface->changeItem(0);
-            } else if (key == KEY_DOWN) {
-                // For changing a pointer selection to one level down
-                this->user_interface->changeItem(1);
-            }
-            this->user_interface->drawStartMenu(15,30);
-        } else {
-            // check if the selected menu item is "start" 
-            Gui::adjustScreenSize();
-            if ( *this->user_interface->startMenu->startMenuActiveItem == "start") {
-                this->startGame();
-            }
-        }
-        
+        key = user_interface->detectConrtolKeys();  
+        if (key == KEY_UP) {
+            // For changing a pointer selection to one level up
+            this->user_interface->changeItem(0);
+        } else if (key == KEY_DOWN) {
+            // For changing a pointer selection to one level down
+            this->user_interface->changeItem(1);
+        } else if ( key == 10 ){
+            if ( *this->user_interface->startMenu->startMenuActiveItem == "start"){
+                int entered;
+                user_interface->clearScreen();
+                do {
+                    // start board drawing part.
+                    int a, b;
+                    this->user_interface->startDrawBoadr( this->table );
+                    a = this->user_interface->getDecimalNumber();
+                    b = this->user_interface->getDecimalNumber();
+
+                    this->table[a - 1][b - 1] = 'd';
+                    refresh();
+                } while ( entered != 'q');                
+            }    
+        } 
+        this->user_interface->drawStartMenu(19,30);
     } while (key != 'q');
+
+    refresh();
     endwin();
 }
 
-void Core::startGame(){
-    //pressed key
-    int key, x = 0, y = 0;
-    bool done = false;
-    clear();
-    do {
-        x = 0;
-        y = 0;
+void Core::fillWords(){
+    this->words = this->model->getQuestions();
+    for(int i = 0; i < words.size(); ++i){
+        if( words[i].length > longestSize ){
+            this->longestIndex = i;
+            this->longestSize = words[i].length;
+        }
+    }
 
-        // printw("you whould enter y x coordinates and after that you should enter a string.");
-        printw("Enter a x");
-        this->getDecimal(x);
+    usedWordsIndexes.push_back(3);
+};
 
-        printw("Enter a y");
-        this->getDecimal(y);
-        
-        printw("Enter a key");
-        key = getch();
+void Core::fillTable(){
+    std::cout << words[longestIndex].question << " question\n";
+    std::cout << words[longestIndex].answer << " answear\n";
 
-        this->table[x][y] = key;
-        user_interface->startDrawBoadr( this->table );
-    } while ( key != 'q');
-    clear();
+    words[longestIndex].xCord = 0;
+    words[longestIndex].yCord = 2;
+
+    std::cout << words[longestIndex].xCord << " x\n";
+    std::cout << words[longestIndex].yCord << " y\n";
+    
+    for(int i = 0; i < words[longestIndex].answer.length(); ++i){
+        int k = table.size();
+        int m = table[2].size();
+
+        table[2][i] = words[longestIndex].answer[i];
+    }
+
+    fillVertical(3, 2, &table[2][3]);
 }
 
-void Core::getDecimal( int& number ){
-    int input;
-    do {
-        input = getch();
-        // take a input from user and convert it to number , if assci code between 9 and 1.
-        if (input <= '9' && input >= '1') {
-            number = number * 10 + input - '0';
+void Core::fillVertical(int horIndex, int verIndex, char *letter){
+    int choosedIndex = 0;
+    std::cout << *letter << "   searched letter\n";
+    for (int i = 0; i < words.size(); i++){
+        int findedIndex = 0;
+        if (words[i].answer.find(*letter) != std::string::npos){
+            findedIndex = words[i].answer.find(*letter);
+            if (verticalSuitable(findedIndex, verIndex, &words[i].answer))
+            {
+                
+            }
+            std::cout << findedIndex << "   finded index\n";
+            std::cout << words[i].answer << "   finded word\n" ;
+            std::cout << words[i].answer[findedIndex] << "   finded letter\n" ;
+            std::cout << "\n" ;
+
         }
-    } while (input != 10);
+    }
+};
+void Core::fillHorizontal(){
+    
+};
+
+bool Core::verticalSuitable(int findedInd, int verInd, std::string* word){
+    if (verInd > findedInd)
+    {
+        std::cout << word->size() << "     some\n";
+    } 
+    return true;   
 }
