@@ -1,2 +1,4 @@
 #pragma once
-#include <iostream>
+#include "menu.h"
+#include "gui.h"
+#include "core.h"
