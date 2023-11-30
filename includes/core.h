@@ -12,21 +12,27 @@ class Core{
 private:
     // string active_state;
     Gui* user_interface;
-    vector<Word> words;
+    std::vector<Word> words;
 public:
     Core(int = 30, int = 30);
     ~Core();
     void detecting_key();
     void startGame();
-    vector<vector<char>> table;
+    std::vector<std::vector<char>> table;
     Model* model;
     void fillTable();
-    vector<int> usedWordsIndexes; 
+    std::vector<int> usedWordsIndexes; 
 private:
     void fillWords();
     int longestIndex;
     int longestSize;
+    
     void fillVertical(int, int, char*);
-    void fillHorizontal();
-    bool verticalSuitable(int, int, std::string*);
+    void fillHorizontal(int, int, char*);
+
+    bool verticalSuitable(int, int, std::string *);
+    bool horizontalSuitable(int, int, std::string *);
+
+    bool containsElement(std::vector<int> &, int &);
+    int randomStrIndex(std::string &, std::vector<int> &);
 };

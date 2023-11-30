@@ -10,7 +10,7 @@ Model::~Model(){
 
 }
 
-vector<Word> Model::getQuestions(){
+std::vector<Word> Model::getQuestions(){
 
     std::ifstream file("other/questions.json");
     if (!file.is_open()) {
@@ -23,7 +23,7 @@ vector<Word> Model::getQuestions(){
         std::cerr << "JSON parse error: " << e.what() << std::endl;
     }
     file.close(); 
-    vector<Word> list;
+    std::vector<Word> list;
     for (const auto& obj : jsonArray) {
         Word item;
 

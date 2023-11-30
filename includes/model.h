@@ -16,6 +16,5 @@ class Model
 public:
     Model();
     ~Model();
-    vector<Word> getQuestions();
-
+    std::vector<Word> getQuestions();
 };

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string.h>
 #include <fstream>
+#include <vector>
 
 class Word {
 private:
@@ -11,12 +12,13 @@ public:
     ~Word();
 
     int qIndex;
-    std::string direction;
     int xCord;
     int yCord;
-    std::string question;
-    std::string answer;
     int length;
+    std::string answer;
+    std::string question;
+    std::string direction;//! not neded for now
+    std::vector<int> usedLetterIndexed;
 public:
     bool checkAnswer(const std::string& aswer);
 };

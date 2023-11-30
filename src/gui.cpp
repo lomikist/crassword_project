@@ -7,8 +7,12 @@
 
 using namespace std;
 
+//
+int Gui::windowHeight;
+int Gui::windowWidth;
+
 Gui::Gui(int verCount, int horCount){
-    vector<string> menuOptions = {"start", "how control","choose control type","your previous results","exit"};
+    std::vector<string> menuOptions = {"start", "how control","choose control type","your previous results","exit"};
 
     this->startMenu = new Menu(menuOptions);
     // (width, height) 
@@ -18,10 +22,6 @@ Gui::Gui(int verCount, int horCount){
 Gui::~Gui(){
 
 }
-
-//
-int Gui::windowHeight;
-int Gui::windowWidth;
 
 /**
  * setting a board size after some events. 
@@ -58,7 +58,7 @@ void Gui::changeItem(int key){
     }
 }
 
-void Gui::startDrawBoadr( vector < vector < char > > & table){
+void Gui::startDrawBoadr( std::vector < std::vector < char > > & table){
     int y = 1;
     int x = (Gui::windowWidth - this->gameBoard->sizes.second) / 2;
 
@@ -70,7 +70,7 @@ void Gui::startDrawBoadr( vector < vector < char > > & table){
             // // print a field number ( 1 + becauese number in left upper part of the field ).
             // mvwprintw(this->gameBoard->mainWindow, 1 + j * 4, 1 + i * 4, "%d", counter);
             // print a char from the board ( 2 + becaues each field is 3 spaces and 1 spase is line)
-            mvwaddch(this->gameBoard->mainWindow, 2 + i * 4, 2 + j * 4, table[i][j]);
+            mvwaddch(this->gameBoard->mainWindow, 1 + i * 2, 2 + j * 4, table[i][j]);
             counter++;
         }
     }   
@@ -91,9 +91,9 @@ void Gui::drawVerticalLines(){
 }
 
 void Gui::drawHorizontalLines(){
-    for(int i = 1; i < this->gameBoard->sizes.first / 4; ++i){
+    for(int i = 1; i < this->gameBoard->sizes.first / 2; ++i){
         // last argument .second because for horizontal line we should print vertical coutn time. 
-        mvwhline(this->gameBoard->mainWindow, i * 4, 1, 0, this->gameBoard->sizes.second - 2);
+        mvwhline(this->gameBoard->mainWindow, i * 2, 1, 0, this->gameBoard->sizes.second - 2);
     }
 }
 

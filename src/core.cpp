@@ -4,6 +4,7 @@
 #include <functional>
 #include <fstream>
 #include <iostream>
+#include <random>
 
 Core::Core(int verCount, int horCount) {
     // this->model = new Model();
@@ -12,14 +13,14 @@ Core::Core(int verCount, int horCount) {
     this->longestIndex = 0;
 
     // board initialization 
-    for (size_t i = 0; i < verCount / 4; ++i) {
+    for (size_t i = 0; i <= verCount / 2; ++i) {
         vector<char> row;       
-        for (size_t j = 0; j < horCount / 4; ++j) {
+        for (size_t j = 0; j <= horCount / 4; ++j) {
             row.push_back(' ');
         }
         this->table.push_back(row);
     }
-    
+
     this->fillWords();
     this->fillTable();
     this->user_interface = new Gui( verCount, horCount );
@@ -92,41 +93,105 @@ void Core::fillTable(){
     
     for(int i = 0; i < words[longestIndex].answer.length(); ++i){
         int k = table.size();
-        int m = table[2].size();
-
-        table[2][i] = words[longestIndex].answer[i];
+        int m = table[5].size();
+        table[5][i] = words[longestIndex].answer[i];
     }
+    
+    int randomIndex = randomStrIndex(words[longestIndex].answer, words[longestIndex].usedLetterIndexed);
 
-    fillVertical(3, 2, &table[2][3]);
+    fillVertical(randomIndex, 5, &words[longestIndex].answer[randomIndex]);
 }
 
 void Core::fillVertical(int horIndex, int verIndex, char *letter){
     int choosedIndex = 0;
-    std::cout << *letter << "   searched letter\n";
+    // std::cout << *letter << "   searched letter\n";
     for (int i = 0; i < words.size(); i++){
         int findedIndex = 0;
-        if (words[i].answer.find(*letter) != std::string::npos){
+        if (
+                words[i].answer.find(*letter) != std::string::npos &&
+                ! containsElement(usedWordsIndexes, i)
+            ){
             findedIndex = words[i].answer.find(*letter);
-            if (verticalSuitable(findedIndex, verIndex, &words[i].answer))
-            {
+            if (verticalSuitable(findedIndex, verIndex, &words[i].answer)) {
+                for (int j = 0; j < words[i].length; j++)
+                {
+                    table[verIndex - findedIndex + j][horIndex] = words[i].answer[j];
+                }
+                usedWordsIndexes.push_back(i);
+                int randomVerIndex = randomStrIndex(words[i].answer , words[i].usedLetterIndexed);
                 
+                // std::cout << "random Index" << randomI << "---\n";
+                // std::cout << "horizontal Index" << horIndex << "---\n";
+                // std::cout << "letter" << words[i].answer << "---\n";
+                // std::cout << "letter" << words[i].answer[randomI] << "---\n";
+                // ! from here
+                fillHorizontal(horIndex, randomVerIndex, &words[i].answer[randomVerIndex]);
+                break;
             }
-            std::cout << findedIndex << "   finded index\n";
-            std::cout << words[i].answer << "   finded word\n" ;
-            std::cout << words[i].answer[findedIndex] << "   finded letter\n" ;
-            std::cout << "\n" ;
-
+            
         }
     }
 };
-void Core::fillHorizontal(){
-    
+void Core::fillHorizontal(int horIndex, int verIndex, char *letter) {
+    for (int i = 0; i < words.size(); i++) {
+        int findedIndex = 0;
+        if (
+            words[i].answer.find(*letter) != std::string::npos && 
+            ! containsElement(usedWordsIndexes, i)
+        ) {
+            findedIndex = words[i].answer.find(*letter);
+            if (horizontalSuitable(findedIndex, verIndex, &words[i].answer)) {
+                for (int j = 0; j < words[i].length; j++) {
+                    table[verIndex + 1][horIndex - findedIndex + j] = words[i].answer[j];
+                }
+                // ! continu from here 
+                usedWordsIndexes.push_back(i);
+                int randomHorIndex = randomStrIndex(words[i].answer , words[i].usedLetterIndexed);
+                
+                fillVertical(randomHorIndex , verIndex + 1, &words[i].answer[randomHorIndex]); 
+                break;
+            }
+        }
+    }
 };
 
-bool Core::verticalSuitable(int findedInd, int verInd, std::string* word){
-    if (verInd > findedInd)
-    {
-        std::cout << word->size() << "     some\n";
-    } 
-    return true;   
+bool Core::verticalSuitable(int findedInd, int verInd, std::string *word) {
+    // TODO check word crossing 
+    if (
+        verInd > findedInd && 
+        verInd - findedInd + word->size() <= 25/2
+    ) { // 25 / 2 is seted in the main 
+        return true;   
+    }
+    return false;
+}
+
+bool Core::horizontalSuitable(int findedInd, int horInd, std::string *word) {
+    // TODO check word crossing 
+    if(
+        horInd > findedInd && 
+        horInd - findedInd + word->size() <= 125/4
+    ) { // ! 125 / 4 is seted in the main (change in the future) 
+        return true;
+    }
+    return false;
+}
+
+bool Core::containsElement(std::vector<int> &vec, int &element)
+{
+    return std::find(vec.begin(), vec.end(), element) != vec.end();
+}
+
+int Core::randomStrIndex(std::string& string, std::vector<int>& existIndexes) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distrib(0, string.size() - 1);
+
+    int generatedNum = distrib(gen);
+    if ( !containsElement(existIndexes, generatedNum) == true){
+        existIndexes.push_back(generatedNum);
+        return (generatedNum);
+    } else{ 
+        return randomStrIndex(string, existIndexes);
+    }
 }
