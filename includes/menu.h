@@ -4,9 +4,7 @@
 #include <ncurses.h>
 #include "string.h"
 using namespace std;
-class Menu
-{
-private:
+class Menu {
 public:
     Menu(vector<string>);
     ~Menu();
@@ -14,3 +12,9 @@ public:
     vector<string> startMenuItems;
     string* startMenuActiveItem;
 };
+
+// class Menu : public MainMenu {
+// public:
+//     MainMenu();
+//     void () override;
+// };

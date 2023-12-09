@@ -10,7 +10,7 @@
 
 class Core{
 private:
-    // string active_state;
+    string active_state;
     Gui* user_interface;
     std::vector<Word> words;
 public:

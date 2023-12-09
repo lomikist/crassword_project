@@ -12,7 +12,7 @@ int Gui::windowHeight;
 int Gui::windowWidth;
 
 Gui::Gui(int verCount, int horCount){
-    std::vector<string> menuOptions = {"start", "how control","choose control type","your previous results","exit"};
+    std::vector<string> menuOptions = {"start", "how control", "colour","exit"};
 
     this->startMenu = new Menu(menuOptions);
     // (width, height) 

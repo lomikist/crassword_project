@@ -12,7 +12,7 @@ Core::Core(int verCount, int horCount) {
     this->longestSize = 0;
     this->longestIndex = 0;
 
-    // board initialization 
+    // board initialization u
     for (size_t i = 0; i <= verCount / 2; ++i) {
         vector<char> row;       
         for (size_t j = 0; j <= horCount / 4; ++j) {
@@ -60,11 +60,20 @@ void Core::startGame(){
                     this->table[a - 1][b - 1] = 'd';
                     refresh();
                 } while ( entered != 'q');                
-            }    
+            }
+            else if ( *this->user_interface->startMenu->startMenuActiveItem == "colour")
+            {
+                user_interface->clearScreen();
+                user_interface->
+            }
+            else if (  *this->user_interface->startMenu->startMenuActiveItem == "exit")
+            {
+                endwin();
+                abort();
+            }
         } 
         this->user_interface->drawStartMenu(19,30);
     } while (key != 'q');
-
     refresh();
     endwin();
 }
@@ -112,6 +121,7 @@ void Core::fillVertical(int horIndex, int verIndex, char *letter){
                 ! containsElement(usedWordsIndexes, i)
             ){
             findedIndex = words[i].answer.find(*letter);
+            words[i].usedLetterIndexed.push_back(i);
             if (verticalSuitable(findedIndex, verIndex, &words[i].answer)) {
                 for (int j = 0; j < words[i].length; j++)
                 {
@@ -132,6 +142,7 @@ void Core::fillVertical(int horIndex, int verIndex, char *letter){
         }
     }
 };
+
 void Core::fillHorizontal(int horIndex, int verIndex, char *letter) {
     for (int i = 0; i < words.size(); i++) {
         int findedIndex = 0;
@@ -140,11 +151,13 @@ void Core::fillHorizontal(int horIndex, int verIndex, char *letter) {
             ! containsElement(usedWordsIndexes, i)
         ) {
             findedIndex = words[i].answer.find(*letter);
+
+            words[i].usedLetterIndexed.push_back(i);
             if (horizontalSuitable(findedIndex, verIndex, &words[i].answer)) {
                 for (int j = 0; j < words[i].length; j++) {
                     table[verIndex + 1][horIndex - findedIndex + j] = words[i].answer[j];
                 }
-                // ! continu from here 
+                //! should make word crossing part, and check what is worng.`
                 usedWordsIndexes.push_back(i);
                 int randomHorIndex = randomStrIndex(words[i].answer , words[i].usedLetterIndexed);
                 
@@ -188,7 +201,7 @@ int Core::randomStrIndex(std::string& string, std::vector<int>& existIndexes) {
     std::uniform_int_distribution<> distrib(0, string.size() - 1);
 
     int generatedNum = distrib(gen);
-    if ( !containsElement(existIndexes, generatedNum) == true){
+    if ( !containsElement(existIndexes, generatedNum) ){
         existIndexes.push_back(generatedNum);
         return (generatedNum);
     } else{ 

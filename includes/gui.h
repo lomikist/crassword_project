@@ -20,7 +20,9 @@ public:
     ~Gui();
     static void adjustScreenSize();
     void changeItem(int );
+    
     void startDrawBoadr(std::vector<std::vector<char>>& );
+
     void drawStartMenu(int,int);
     void drawVerticalLines();
     void drawHorizontalLines();
