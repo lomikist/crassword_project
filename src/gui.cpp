@@ -7,14 +7,13 @@
 
 using namespace std;
 
-//
 int Gui::windowHeight;
 int Gui::windowWidth;
 
 Gui::Gui(int verCount, int horCount){
-    std::vector<string> menuOptions = {"start", "how control", "colour","exit"};
+    std::vector<string> menuOptions = {"start", "how control", "color","exit"};
 
-    this->startMenu = new Menu(menuOptions);
+    this->menu = new Menu(menuOptions);
     // (width, height) 
     this->gameBoard = new Board(verCount, horCount);
 }
@@ -30,31 +29,32 @@ void Gui::adjustScreenSize(){
     getmaxyx(stdscr, Gui::windowHeight, Gui::windowWidth);
 }
 
-void Gui::drawStartMenu(int height, int width){
+void Gui::drawMenu(int height, int width){
     int y = (Gui::windowHeight - height) / 2;
     int x = (Gui::windowWidth - width) / 2;
 
-    this->startMenu->mainWindow = newwin(height, width, y, x);
-    box(this->startMenu->mainWindow, 0, 0);
+    this->menu->mainWindow = newwin(height, width, y, x);
+    box(this->menu->mainWindow, 0, 0);
+    wbkgd(this->menu->mainWindow, COLOR_PAIR(2));
 
-    for (int i = 0; i < this->startMenu->startMenuItems.size(); ++i) {
-        if ( &this->startMenu->startMenuItems[i] == this->startMenu->startMenuActiveItem ) {
-            mvwprintw(this->startMenu->mainWindow, (i + 0.5) * height / this->startMenu->startMenuItems.size(), 2, "----->");
-            mvwprintw(this->startMenu->mainWindow, (i + 0.5) * height / this->startMenu->startMenuItems.size(), 9, "%s", this->startMenu->startMenuActiveItem->c_str() );
+    for (int i = 0; i < this->menu->activeItems.size(); ++i) {
+        if ( &this->menu->activeItems[i] == this->menu->currentItem ) {
+            mvwprintw(this->menu->mainWindow, (i + 0.5) * height / this->menu->activeItems.size(), 2, "----->");
+            mvwprintw(this->menu->mainWindow, (i + 0.5) * height / this->menu->activeItems.size(), 9, "%s", this->menu->currentItem->c_str() );
         } else {
-            mvwprintw(this->startMenu->mainWindow, (i + 0.5) * height / this->startMenu->startMenuItems.size(), 2, "%s", this->startMenu->startMenuItems[i].c_str());
+            mvwprintw(this->menu->mainWindow, (i + 0.5) * height / this->menu->activeItems.size(), 2, "%s", this->menu->activeItems[i].c_str());
         }
     }
-    wrefresh(this->startMenu->mainWindow);
+    wrefresh(this->menu->mainWindow);
 }
 
 void Gui::changeItem(int key){
     // for down
-    if ( key == 1 && this->startMenu->startMenuActiveItem != &this->startMenu->startMenuItems[this->startMenu->startMenuItems.size() - 1] ) {
-        this->startMenu->startMenuActiveItem = this->startMenu->startMenuActiveItem + 1;
-    } else if (key == 0 && this->startMenu->startMenuActiveItem != &this->startMenu->startMenuItems[0]) {
+    if ( key == 1 && this->menu->currentItem != &this->menu->activeItems[this->menu->activeItems.size() - 1] ) {
+        this->menu->currentItem = this->menu->currentItem + 1;
+    } else if (key == 0 && this->menu->currentItem != &this->menu->activeItems[0]) {
         // for up
-        this->startMenu->startMenuActiveItem = this->startMenu->startMenuActiveItem - 1;
+        this->menu->currentItem = this->menu->currentItem - 1;
     }
 }
 
@@ -64,6 +64,8 @@ void Gui::startDrawBoadr( std::vector < std::vector < char > > & table){
 
     // initialaze game board
     this->gameBoard->mainWindow = newwin(gameBoard->sizes.first, gameBoard->sizes.second, y, x);
+    box(this->gameBoard->mainWindow, 0, 0);
+
     int counter = 1;
     for (int i = 0; i < table.size(); ++i) {
         for (int j = 0; j < table[i].size(); ++j) {
@@ -74,13 +76,11 @@ void Gui::startDrawBoadr( std::vector < std::vector < char > > & table){
             counter++;
         }
     }   
-    box(this->gameBoard->mainWindow, 0, 0);
 
     this->drawHorizontalLines();
     this->drawVerticalLines();
 
     wrefresh(this->gameBoard->mainWindow);
-    // wrefresh(inputWindow);
 }
 
 void Gui::drawVerticalLines(){
@@ -127,4 +127,34 @@ int Gui::getDecimalNumber(){
 
 void Gui::clearScreen(){
     clear();
+}
+
+void Gui::initScreen() {
+    initscr();
+    start_color();
+    cbreak();
+    noecho();
+    keypad(stdscr, true);
+    if (!has_colors()) {
+        endwin();
+        printf("Your terminal does not support color\n");
+        abort();
+    }
+
+    // pait for color
+    init_pair(1, COLOR_WHITE, COLOR_BLACK); 
+    init_pair(2, COLOR_WHITE, COLOR_RED);
+    init_pair(3, COLOR_WHITE, COLOR_BLUE);
+    init_pair(4, COLOR_WHITE, COLOR_GREEN);
+    init_pair(5, COLOR_WHITE, COLOR_MAGENTA);
+    init_pair(6, COLOR_WHITE, COLOR_CYAN);
+}
+
+void Gui::changeConsoleColor(const int pairIndex) {
+    bkgd(COLOR_PAIR(pairIndex));
+}
+
+void Gui::changeWindowColor(const int pairIndex) {
+    wbkgd(this->menu->mainWindow, COLOR_PAIR(pairIndex));
+    wrefresh(this->menu->mainWindow);
 }

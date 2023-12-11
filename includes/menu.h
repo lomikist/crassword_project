@@ -5,16 +5,21 @@
 #include "string.h"
 using namespace std;
 class Menu {
-public:
-    Menu(vector<string>);
-    ~Menu();
-    WINDOW* mainWindow;
-    vector<string> startMenuItems;
-    string* startMenuActiveItem;
+    protected:
+    public: 
+        Menu(vector<string> );
+        ~Menu();
+        
+        void setActiveItems(vector<string> );
+        vector<string> getActiveItems();
+
+        vector<string> activeItems;
+        // is storing that items which should be shown after left arrow pressing.
+        vector<string> prevActiveItems;
+        // which is selected (console || window)
+        string colorOption;
+
+        WINDOW* mainWindow;
+        string* currentItem;
 };
 
-// class Menu : public MainMenu {
-// public:
-//     MainMenu();
-//     void () override;
-// };

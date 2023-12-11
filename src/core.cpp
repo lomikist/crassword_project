@@ -31,12 +31,8 @@ Core::~Core()
 }
 
 void Core::startGame(){
-
-    initscr();
-    keypad(stdscr, true);
-
+    this->user_interface->initScreen(); 
     this->user_interface->adjustScreenSize();
-    
     int key = 0;
     do {
         key = user_interface->detectConrtolKeys();  
@@ -47,11 +43,10 @@ void Core::startGame(){
             // For changing a pointer selection to one level down
             this->user_interface->changeItem(1);
         } else if ( key == 10 ){
-            if ( *this->user_interface->startMenu->startMenuActiveItem == "start"){
+            if ( *this->user_interface->menu->currentItem == "start"){
                 int entered;
                 user_interface->clearScreen();
                 do {
-                    // start board drawing part.
                     int a, b;
                     this->user_interface->startDrawBoadr( this->table );
                     a = this->user_interface->getDecimalNumber();
@@ -59,23 +54,94 @@ void Core::startGame(){
 
                     this->table[a - 1][b - 1] = 'd';
                     refresh();
-                } while ( entered != 'q');                
+                } while ( entered != 'q');              
             }
-            else if ( *this->user_interface->startMenu->startMenuActiveItem == "colour")
+            else if ( *this->user_interface->menu->currentItem == "how control" )
             {
-                user_interface->clearScreen();
-                user_interface->
+                
             }
-            else if (  *this->user_interface->startMenu->startMenuActiveItem == "exit")
+            else if ( *this->user_interface->menu->currentItem == "color" )
+            {
+                this->user_interface->menu->prevActiveItems = this->user_interface->menu->activeItems;
+                this->user_interface->menu->activeItems = {"console", "window"};
+                this->user_interface->menu->currentItem = &this->user_interface->menu->activeItems[0];
+            }
+            else if ( *this->user_interface->menu->currentItem == "exit" )
             {
                 endwin();
                 abort();
+            } else if ( *this->user_interface->menu->currentItem == "console" || 
+                        *this->user_interface->menu->currentItem == "window" ) {
+                this->user_interface->menu->colorOption = *this->user_interface->menu->currentItem;
+                this->user_interface->menu->prevActiveItems = {"start", "color", "exit", "how control"};
+                this->user_interface->menu->activeItems = {"black", "red", "blue", "cyan", "green", "magenta"};
+                this->user_interface->menu->currentItem = &this->user_interface->menu->activeItems[0];
+            } else {
+                if ( *this->user_interface->menu->currentItem == "black") {
+                    if(this->user_interface->menu->colorOption == "console"){
+                        this->user_interface->changeConsoleColor(1);
+                    }
+                    else if(this->user_interface->menu->colorOption == "window"){
+                        this->user_interface->changeWindowColor(1);
+                    }
+                }
+                else if ( *this->user_interface->menu->currentItem == "red") {
+                    if(this->user_interface->menu->colorOption == "console"){
+                        this->user_interface->changeConsoleColor(2);
+                    }
+                    else if(this->user_interface->menu->colorOption == "window"){
+                        this->user_interface->changeWindowColor(2);
+                    }
+                }
+                else if ( *this->user_interface->menu->currentItem == "blue") {
+                    if(this->user_interface->menu->colorOption == "console"){
+                        this->user_interface->changeConsoleColor(3);
+                    }
+                    else if(this->user_interface->menu->colorOption == "window"){
+                        this->user_interface->changeWindowColor(3);
+                    }
+                }
+                else if ( *this->user_interface->menu->currentItem == "cyan") {
+                    if(this->user_interface->menu->colorOption == "console"){
+                        this->user_interface->changeConsoleColor(6);
+                    }
+                    else if(this->user_interface->menu->colorOption == "window"){
+                        this->user_interface->changeWindowColor(6);
+                    }
+                }
+                else if ( *this->user_interface->menu->currentItem == "magenta") {
+                    if(this->user_interface->menu->colorOption == "console"){
+                        this->user_interface->changeConsoleColor(5);
+                    }
+                    else if(this->user_interface->menu->colorOption == "window"){
+                        this->user_interface->changeWindowColor(5);
+                    }
+                }
+                else if ( *this->user_interface->menu->currentItem == "green") {
+                    if(this->user_interface->menu->colorOption == "console"){
+                        this->user_interface->changeConsoleColor(4);
+                    }
+                    else if(this->user_interface->menu->colorOption == "window"){
+                        this->user_interface->changeWindowColor(4);
+                    }
+                }
+
+                    init_pair(2, COLOR_WHITE, COLOR_RED);
+                    init_pair(3, COLOR_WHITE, COLOR_BLUE);
             }
-        } 
-        this->user_interface->drawStartMenu(19,30);
+        } else if (key == KEY_LEFT){
+            this->user_interface->menu->activeItems = this->user_interface->menu->prevActiveItems;
+            this->user_interface->menu->currentItem = &this->user_interface->menu->activeItems[0];
+        }
+        this->user_interface->drawMenu(19,30);
     } while (key != 'q');
     refresh();
     endwin();
+}
+
+void changeConsoleColor()
+{   
+
 }
 
 void Core::fillWords(){
@@ -86,7 +152,6 @@ void Core::fillWords(){
             this->longestSize = words[i].length;
         }
     }
-
     usedWordsIndexes.push_back(3);
 };
 
