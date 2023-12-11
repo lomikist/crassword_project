@@ -11,7 +11,7 @@ class Gui
 private:
 
 public:
-    Menu* startMenu;
+    Menu* menu;
     Board* gameBoard;
     static int windowHeight;
     static int windowWidth;
@@ -20,13 +20,15 @@ public:
     ~Gui();
     static void adjustScreenSize();
     void changeItem(int );
-    
+    void changeConsoleColor(const int);
+    void changeWindowColor(const int);
     void startDrawBoadr(std::vector<std::vector<char>>& );
-
-    void drawStartMenu(int,int);
+    void initScreen();
+    void drawMenu(int,int);
     void drawVerticalLines();
     void drawHorizontalLines();
     int detectConrtolKeys();
     void clearScreen();
     int getDecimalNumber();
+    void initMenu(int, int);
 };
