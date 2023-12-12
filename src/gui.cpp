@@ -1,7 +1,4 @@
 #include "../includes/gui.h"
-#include "../includes/board.h"
-#include <menu.h>
-#include <ncurses.h>
 #include <map>
 #include <functional>
 
@@ -52,9 +49,8 @@ void Gui::changeItem(int key){
     }
 }
 
-void Gui::startDrawBoadr( std::vector < std::vector < char > > & table){
+void Gui::drawBoadr( std::vector < std::vector < char > > & table){
     box(this->gameBoard->mainWindow, 0, 0);
-    box(this->gameBoard->questWindow, '*', '*');
 
     for (int i = 0; i < table.size(); ++i) {
         for (int j = 0; j < table[i].size(); ++j) {
@@ -67,8 +63,21 @@ void Gui::startDrawBoadr( std::vector < std::vector < char > > & table){
     this->drawHorizontalLines();
     this->drawVerticalLines();
 
-    wrefresh(this->gameBoard->questWindow);
     wrefresh(this->gameBoard->mainWindow);
+}
+
+void Gui::drawQuestions(const std::vector<Word> & list, const std::vector<int>  &indexes) { 
+    box(this->gameBoard->questWindow, '*', '*');
+    
+    int showIndex = 0;
+    for(int i = 0; i < indexes.size(); ++i){
+        mvwprintw(this->gameBoard->questWindow, 1 + i, 1,
+                                                "%d) %s",
+                                                i + 1,
+                                                list[indexes[i]].question.c_str()
+                );
+    }
+    wrefresh(this->gameBoard->questWindow);
 }
 
 void Gui::drawVerticalLines(){
@@ -86,9 +95,7 @@ void Gui::drawHorizontalLines(){
 }
 
 int Gui::detectConrtolKeys(){    
-    // adjusting a window sizes.
     int key = getch();
-    // if pressed button is not enter
     if ( key == KEY_UP 
         || key == KEY_DOWN 
         || key == KEY_LEFT 
@@ -142,7 +149,7 @@ void Gui::clearWindow(WINDOW *win){
     wclear(win);
 }
 
-void Gui::initScreen() {
+void Gui::initScreen() {    
     initscr();
     start_color();
     cbreak();
@@ -171,4 +178,5 @@ void Gui::changeConsoleColor(const int pairIndex) {
 void Gui::changeWindowColor(const int pairIndex) {
     wbkgd(this->menu->mainWindow, COLOR_PAIR(pairIndex));
     wbkgd(this->gameBoard->mainWindow, COLOR_PAIR(pairIndex));
+    wbkgd(this->gameBoard->questWindow, COLOR_PAIR(pairIndex));
 }

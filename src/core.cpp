@@ -47,7 +47,9 @@ void Core::startGame(){
                 this->user_interface->clearScreen();
                 do {
                     int a, b;
-                    this->user_interface->startDrawBoadr( this->table );
+                    this->user_interface->drawBoadr(this->table);
+                    this->user_interface->drawQuestions(this->words, this->usedWordsIndexes);
+
                     a = this->user_interface->getDecimalNumber();
                     b = this->user_interface->getDecimalNumber();
 
@@ -138,11 +140,6 @@ void Core::startGame(){
     endwin();
 }
 
-void changeConsoleColor()
-{   
-
-}
-
 void Core::fillWords(){
     this->words = this->model->getQuestions();
     for(int i = 0; i < words.size(); ++i){
@@ -151,28 +148,21 @@ void Core::fillWords(){
             this->longestSize = words[i].length;
         }
     }
-    usedWordsIndexes.push_back(3);
 };
 
 void Core::fillTable(){
-    std::cout << words[longestIndex].question << " question\n";
-    std::cout << words[longestIndex].answer << " answear\n";
-
     words[longestIndex].xCord = 0;
-    words[longestIndex].yCord = 2;
+    words[longestIndex].yCord = 5;
 
-    std::cout << words[longestIndex].xCord << " x\n";
-    std::cout << words[longestIndex].yCord << " y\n";
-    
     for(int i = 0; i < words[longestIndex].answer.length(); ++i){
         int k = table.size();
-        int m = table[5].size();
-        table[5][i] = words[longestIndex].answer[i];
+        int m = table[2].size();
+        table[words[longestIndex].yCord][words[longestIndex].xCord + i] = words[longestIndex].answer[i];
     }
     
     int randomIndex = randomStrIndex(words[longestIndex].answer, words[longestIndex].usedLetterIndexed);
 
-    fillVertical(randomIndex, 5, &words[longestIndex].answer[randomIndex]);
+    fillVertical(randomIndex, words[longestIndex].yCord, &words[longestIndex].answer[randomIndex]);
 }
 
 void Core::fillVertical(int horIndex, int verIndex, char *letter){
