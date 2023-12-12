@@ -4,6 +4,7 @@
 #include <ncurses.h>
 #include "menu.h"
 #include "board.h"
+#include "word.h"
 
 using namespace std;
 class Gui
@@ -13,7 +14,7 @@ private:
 public:
     Menu* menu;
     Board* gameBoard;
-        
+
     static int windowHeight;
     static int windowWidth;
 public:
@@ -23,7 +24,10 @@ public:
     void changeItem(int );
     void changeConsoleColor(const int);
     void changeWindowColor(const int);
-    void startDrawBoadr(std::vector<std::vector<char>>& );
+
+    void drawBoadr(std::vector<std::vector<char>>& );
+    void drawQuestions(const std::vector<Word> &, const std::vector<int> &);
+
     void initScreen();
     void drawMenu(int,int);
     void drawVerticalLines();
