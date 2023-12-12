@@ -13,6 +13,7 @@ private:
 public:
     Menu* menu;
     Board* gameBoard;
+        
     static int windowHeight;
     static int windowWidth;
 public:
@@ -31,4 +32,7 @@ public:
     void clearScreen();
     int getDecimalNumber();
     void initMenu(int, int);
+    void initGameBoard(int, int);
+    void initQuestBoard(int, int);
+    void clearWindow(WINDOW *);
 };

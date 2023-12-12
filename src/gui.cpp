@@ -11,31 +11,24 @@ int Gui::windowHeight;
 int Gui::windowWidth;
 
 Gui::Gui(int verCount, int horCount){
-    std::vector<string> menuOptions = {"start", "how control", "color","exit"};
+    this->initScreen(); 
+    this->adjustScreenSize();
 
-    this->menu = new Menu(menuOptions);
-    // (width, height) 
-    this->gameBoard = new Board(verCount, horCount);
+    // (height, width)
+    this->initMenu(20, 30);
+    // (width, height)
+    this->initGameBoard(verCount, horCount);
 }
 
 Gui::~Gui(){
-
 }
 
-/**
- * setting a board size after some events. 
-*/
 void Gui::adjustScreenSize(){
     getmaxyx(stdscr, Gui::windowHeight, Gui::windowWidth);
 }
 
 void Gui::drawMenu(int height, int width){
-    int y = (Gui::windowHeight - height) / 2;
-    int x = (Gui::windowWidth - width) / 2;
-
-    this->menu->mainWindow = newwin(height, width, y, x);
     box(this->menu->mainWindow, 0, 0);
-    wbkgd(this->menu->mainWindow, COLOR_PAIR(2));
 
     for (int i = 0; i < this->menu->activeItems.size(); ++i) {
         if ( &this->menu->activeItems[i] == this->menu->currentItem ) {
@@ -45,6 +38,7 @@ void Gui::drawMenu(int height, int width){
             mvwprintw(this->menu->mainWindow, (i + 0.5) * height / this->menu->activeItems.size(), 2, "%s", this->menu->activeItems[i].c_str());
         }
     }
+
     wrefresh(this->menu->mainWindow);
 }
 
@@ -59,27 +53,21 @@ void Gui::changeItem(int key){
 }
 
 void Gui::startDrawBoadr( std::vector < std::vector < char > > & table){
-    int y = 1;
-    int x = (Gui::windowWidth - this->gameBoard->sizes.second) / 2;
-
-    // initialaze game board
-    this->gameBoard->mainWindow = newwin(gameBoard->sizes.first, gameBoard->sizes.second, y, x);
     box(this->gameBoard->mainWindow, 0, 0);
+    box(this->gameBoard->questWindow, '*', '*');
 
-    int counter = 1;
     for (int i = 0; i < table.size(); ++i) {
         for (int j = 0; j < table[i].size(); ++j) {
-            // // print a field number ( 1 + becauese number in left upper part of the field ).
             // mvwprintw(this->gameBoard->mainWindow, 1 + j * 4, 1 + i * 4, "%d", counter);
             // print a char from the board ( 2 + becaues each field is 3 spaces and 1 spase is line)
             mvwaddch(this->gameBoard->mainWindow, 1 + i * 2, 2 + j * 4, table[i][j]);
-            counter++;
         }
     }   
 
     this->drawHorizontalLines();
     this->drawVerticalLines();
 
+    wrefresh(this->gameBoard->questWindow);
     wrefresh(this->gameBoard->mainWindow);
 }
 
@@ -125,8 +113,33 @@ int Gui::getDecimalNumber(){
     return number;
 }
 
+void Gui::initMenu(int height, int width)
+{
+    std::vector<string> menuOptions = {"start", "how control", "color","exit"};
+    int y = (Gui::windowHeight - height) / 2;
+    int x = (Gui::windowWidth - width) / 2;
+
+    this->menu = new Menu(menuOptions);
+    this->menu->height = height;
+    this->menu->width = width;
+    this->menu->mainWindow = newwin(this->menu->height, this->menu->width, y, x);
+}
+
+void Gui::initGameBoard(int verCount, int horCount)
+{
+    this->gameBoard = new Board(verCount, horCount);
+    int y = 0;
+    int x = (Gui::windowWidth - this->gameBoard->sizes.second) / 2;
+    this->gameBoard->mainWindow = newwin(this->gameBoard->sizes.first, this->gameBoard->sizes.second, y, x);
+    this->gameBoard->questWindow = newwin(Gui::windowHeight - this->gameBoard->sizes.first, this->gameBoard->sizes.second, y + this->gameBoard->sizes.first, x);
+}
+
 void Gui::clearScreen(){
     clear();
+}
+
+void Gui::clearWindow(WINDOW *win){
+    wclear(win);
 }
 
 void Gui::initScreen() {
@@ -137,7 +150,7 @@ void Gui::initScreen() {
     keypad(stdscr, true);
     if (!has_colors()) {
         endwin();
-        printf("Your terminal does not support color\n");
+        printf("Bratan your teminal dose not support colors.\n");
         abort();
     }
 
@@ -152,9 +165,10 @@ void Gui::initScreen() {
 
 void Gui::changeConsoleColor(const int pairIndex) {
     bkgd(COLOR_PAIR(pairIndex));
+    refresh();
 }
 
 void Gui::changeWindowColor(const int pairIndex) {
     wbkgd(this->menu->mainWindow, COLOR_PAIR(pairIndex));
-    wrefresh(this->menu->mainWindow);
+    wbkgd(this->gameBoard->mainWindow, COLOR_PAIR(pairIndex));
 }

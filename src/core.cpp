@@ -31,7 +31,6 @@ Core::~Core()
 }
 
 void Core::startGame(){
-    this->user_interface->initScreen(); 
     this->user_interface->adjustScreenSize();
     int key = 0;
     do {
@@ -45,7 +44,7 @@ void Core::startGame(){
         } else if ( key == 10 ){
             if ( *this->user_interface->menu->currentItem == "start"){
                 int entered;
-                user_interface->clearScreen();
+                this->user_interface->clearScreen();
                 do {
                     int a, b;
                     this->user_interface->startDrawBoadr( this->table );
@@ -53,7 +52,9 @@ void Core::startGame(){
                     b = this->user_interface->getDecimalNumber();
 
                     this->table[a - 1][b - 1] = 'd';
-                    refresh();
+                    this->user_interface->clearWindow(this->user_interface->menu->mainWindow);
+                    
+                    wrefresh(this->user_interface->gameBoard->mainWindow);
                 } while ( entered != 'q');              
             }
             else if ( *this->user_interface->menu->currentItem == "how control" )
@@ -125,15 +126,13 @@ void Core::startGame(){
                         this->user_interface->changeWindowColor(4);
                     }
                 }
-
-                    init_pair(2, COLOR_WHITE, COLOR_RED);
-                    init_pair(3, COLOR_WHITE, COLOR_BLUE);
             }
         } else if (key == KEY_LEFT){
             this->user_interface->menu->activeItems = this->user_interface->menu->prevActiveItems;
             this->user_interface->menu->currentItem = &this->user_interface->menu->activeItems[0];
         }
-        this->user_interface->drawMenu(19,30);
+        this->user_interface->clearWindow(this->user_interface->menu->mainWindow);
+        this->user_interface->drawMenu(this->user_interface->menu->height, this->user_interface->menu->width);
     } while (key != 'q');
     refresh();
     endwin();

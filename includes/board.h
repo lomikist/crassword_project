@@ -14,5 +14,5 @@ public:
     // board size (it means count of the lines and columns, its not mean a letter fileds count.)
     std::pair<int, int> sizes;
     WINDOW* mainWindow;
-    WINDOW* inputWindow;
+    WINDOW* questWindow;
 };
