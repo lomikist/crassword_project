@@ -172,7 +172,6 @@ void Gui::initScreen() {
 
 void Gui::changeConsoleColor(const int pairIndex) {
     bkgd(COLOR_PAIR(pairIndex));
-    refresh();
 }
 
 void Gui::changeWindowColor(const int pairIndex) {

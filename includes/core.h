@@ -29,9 +29,9 @@ private:
     
     void fillVertical(int, int, char*);
     void fillHorizontal(int, int, char*);
-
-    bool verticalSuitable(int, int, std::string *);
-    bool horizontalSuitable(int, int, std::string *);
+    void setColor();
+    bool verticalSuitable(int ,int, int, std::string &);
+    bool horizontalSuitable(int, int, int, std::string &);
 
     bool containsElement(std::vector<int> &, int &);
     int randomStrIndex(std::string &, std::vector<int> &);
