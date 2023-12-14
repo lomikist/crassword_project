@@ -5,14 +5,19 @@
         "answer": "Paris"
     },
     {
+        "clue": "Chemical compound used as a solvent",
+        "length": 18,
+        "answer": "Tetrachloroethylene"
+    },
+    {
         "clue": "Largest planet in our solar system",
         "length": 7,
         "answer": "Jupiter"
     },
     {
-        "clue": "Earth's natural satellite",
-        "length": 4,
-        "answer": "Moon"
+        "clue": "A circle's outer boundary",
+        "length": 7,
+        "answer": "Perimeter"
     },
     {
         "clue": "Unit of measurement for time",
@@ -23,6 +28,11 @@
         "clue": "First man to walk on the moon",
         "length": 4,
         "answer": "Neil"
+    },
+    {
+        "clue": "A figure with at least ten straight sides",
+        "length": 7,
+        "answer": "Decagon"
     },
     {
         "clue": "Famous scientist known for the theory of relativity",
@@ -86,8 +96,8 @@
     },
     {
         "clue": "The process by which plants make their food",
-        "length": 13,
-        "answer": "Photosynthesis"
+        "length": 12,
+        "answer": "Photosynthes"
     },
     {
         "clue": "The largest mammal on Earth",
@@ -210,11 +220,6 @@
         "answer": "Geology"
     },
     {
-        "clue": "A figure with at least ten straight sides",
-        "length": 10,
-        "answer": "Decagon"
-    },
-    {
         "clue": "The capital of South Korea",
         "length": 5,
         "answer": "Seoul"
@@ -255,10 +260,11 @@
         "answer": "He"
     },
     {
-        "clue": "A circle's outer boundary",
-        "length": 7,
-        "answer": "Perimeter"
+        "clue": "Earth's natural satellite",
+        "length": 4,
+        "answer": "Moon"
     },
+    
     {
         "clue": "The study of heavenly bodies",
         "length": 5,

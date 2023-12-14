@@ -1,8 +1,8 @@
 #include "../includes/menu.h"
 
 Menu::Menu(vector<string> options){
-    this->activeItems = options;
-    this->prevActiveItems = options;
+    this->prevActiveItems.push_back(options);
+    this->activeItems = this->prevActiveItems.back();
     this->currentItem = &this->activeItems[0];
 }
 

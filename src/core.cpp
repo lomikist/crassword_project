@@ -65,8 +65,8 @@ void Core::startGame(){
             }
             else if ( *this->user_interface->menu->currentItem == "color" )
             {
-                this->user_interface->menu->prevActiveItems = this->user_interface->menu->activeItems;
-                this->user_interface->menu->activeItems = {"console", "window"};
+                this->user_interface->menu->prevActiveItems.push_back({"console", "window"});
+                this->user_interface->menu->activeItems = this->user_interface->menu->prevActiveItems.back();
                 this->user_interface->menu->currentItem = &this->user_interface->menu->activeItems[0];
             }
             else if ( *this->user_interface->menu->currentItem == "exit" )
@@ -76,61 +76,15 @@ void Core::startGame(){
             } else if ( *this->user_interface->menu->currentItem == "console" || 
                         *this->user_interface->menu->currentItem == "window" ) {
                 this->user_interface->menu->colorOption = *this->user_interface->menu->currentItem;
-                this->user_interface->menu->prevActiveItems = {"start", "color", "exit", "how control"};
-                this->user_interface->menu->activeItems = {"black", "red", "blue", "cyan", "green", "magenta"};
+                this->user_interface->menu->prevActiveItems.push_back({"black", "red", "blue", "cyan", "green", "magenta"});
+                this->user_interface->menu->activeItems = this->user_interface->menu->prevActiveItems.back();
                 this->user_interface->menu->currentItem = &this->user_interface->menu->activeItems[0];
             } else {
-                if ( *this->user_interface->menu->currentItem == "black") {
-                    if(this->user_interface->menu->colorOption == "console"){
-                        this->user_interface->changeConsoleColor(1);
-                    }
-                    else if(this->user_interface->menu->colorOption == "window"){
-                        this->user_interface->changeWindowColor(1);
-                    }
-                }
-                else if ( *this->user_interface->menu->currentItem == "red") {
-                    if(this->user_interface->menu->colorOption == "console"){
-                        this->user_interface->changeConsoleColor(2);
-                    }
-                    else if(this->user_interface->menu->colorOption == "window"){
-                        this->user_interface->changeWindowColor(2);
-                    }
-                }
-                else if ( *this->user_interface->menu->currentItem == "blue") {
-                    if(this->user_interface->menu->colorOption == "console"){
-                        this->user_interface->changeConsoleColor(3);
-                    }
-                    else if(this->user_interface->menu->colorOption == "window"){
-                        this->user_interface->changeWindowColor(3);
-                    }
-                }
-                else if ( *this->user_interface->menu->currentItem == "cyan") {
-                    if(this->user_interface->menu->colorOption == "console"){
-                        this->user_interface->changeConsoleColor(6);
-                    }
-                    else if(this->user_interface->menu->colorOption == "window"){
-                        this->user_interface->changeWindowColor(6);
-                    }
-                }
-                else if ( *this->user_interface->menu->currentItem == "magenta") {
-                    if(this->user_interface->menu->colorOption == "console"){
-                        this->user_interface->changeConsoleColor(5);
-                    }
-                    else if(this->user_interface->menu->colorOption == "window"){
-                        this->user_interface->changeWindowColor(5);
-                    }
-                }
-                else if ( *this->user_interface->menu->currentItem == "green") {
-                    if(this->user_interface->menu->colorOption == "console"){
-                        this->user_interface->changeConsoleColor(4);
-                    }
-                    else if(this->user_interface->menu->colorOption == "window"){
-                        this->user_interface->changeWindowColor(4);
-                    }
-                }
+                this->setColor();
             }
-        } else if (key == KEY_LEFT){
-            this->user_interface->menu->activeItems = this->user_interface->menu->prevActiveItems;
+        } else if (key == KEY_LEFT && this->user_interface->menu->prevActiveItems.size() > 1){
+            this->user_interface->menu->prevActiveItems.pop_back();
+            this->user_interface->menu->activeItems = this->user_interface->menu->prevActiveItems.back();
             this->user_interface->menu->currentItem = &this->user_interface->menu->activeItems[0];
         }
         this->user_interface->clearWindow(this->user_interface->menu->mainWindow);
@@ -138,6 +92,57 @@ void Core::startGame(){
     } while (key != 'q');
     refresh();
     endwin();
+}
+
+void Core::setColor(){
+    if ( *this->user_interface->menu->currentItem == "black") {
+        if(this->user_interface->menu->colorOption == "console"){
+            this->user_interface->changeConsoleColor(1);
+        }
+        else if(this->user_interface->menu->colorOption == "window"){
+            this->user_interface->changeWindowColor(1);
+        }
+    }
+    else if ( *this->user_interface->menu->currentItem == "red") {
+        if(this->user_interface->menu->colorOption == "console"){
+            this->user_interface->changeConsoleColor(2);
+        }
+        else if(this->user_interface->menu->colorOption == "window"){
+            this->user_interface->changeWindowColor(2);
+        }
+    }
+    else if ( *this->user_interface->menu->currentItem == "blue") {
+        if(this->user_interface->menu->colorOption == "console"){
+            this->user_interface->changeConsoleColor(3);
+        }
+        else if(this->user_interface->menu->colorOption == "window"){
+            this->user_interface->changeWindowColor(3);
+        }
+    }
+    else if ( *this->user_interface->menu->currentItem == "cyan") {
+        if(this->user_interface->menu->colorOption == "console"){
+            this->user_interface->changeConsoleColor(6);
+        }
+        else if(this->user_interface->menu->colorOption == "window"){
+            this->user_interface->changeWindowColor(6);
+        }
+    }
+    else if ( *this->user_interface->menu->currentItem == "magenta") {
+        if(this->user_interface->menu->colorOption == "console"){
+            this->user_interface->changeConsoleColor(5);
+        }
+        else if(this->user_interface->menu->colorOption == "window"){
+            this->user_interface->changeWindowColor(5);
+        }
+    }
+    else if ( *this->user_interface->menu->currentItem == "green") {
+        if(this->user_interface->menu->colorOption == "console"){
+            this->user_interface->changeConsoleColor(4);
+        }
+        else if(this->user_interface->menu->colorOption == "window"){
+            this->user_interface->changeWindowColor(4);
+        }
+    }
 }
 
 void Core::fillWords(){
@@ -156,7 +161,7 @@ void Core::fillTable(){
 
     for(int i = 0; i < words[longestIndex].answer.length(); ++i){
         int k = table.size();
-        int m = table[2].size();
+        int m = table[5].size();
         table[words[longestIndex].yCord][words[longestIndex].xCord + i] = words[longestIndex].answer[i];
     }
     
@@ -167,32 +172,32 @@ void Core::fillTable(){
 
 void Core::fillVertical(int horIndex, int verIndex, char *letter){
     int choosedIndex = 0;
-    // std::cout << *letter << "   searched letter\n";
+    //TODO in the future change to randome selection.
     for (int i = 0; i < words.size(); i++){
         int findedIndex = 0;
         if (
-                words[i].answer.find(*letter) != std::string::npos &&
-                ! containsElement(usedWordsIndexes, i)
-            ){
+            words[i].answer.find(*letter) != std::string::npos &&
+            ! containsElement(usedWordsIndexes, i)
+        ){
             findedIndex = words[i].answer.find(*letter);
-            words[i].usedLetterIndexed.push_back(i);
-            if (verticalSuitable(findedIndex, verIndex, &words[i].answer)) {
+            words[i].usedLetterIndexed.push_back(findedIndex);
+            // std::cout << "finded_index -- " << findedIndex << "\n";
+            // std::cout << "vertical_index -- " << verIndex << "\n";
+            // std::cout << "answer -- " << words[i].answer << "\n";
+            if (verticalSuitable(findedIndex, horIndex, verIndex, words[i].answer)) {
                 for (int j = 0; j < words[i].length; j++)
                 {
                     table[verIndex - findedIndex + j][horIndex] = words[i].answer[j];
                 }
                 usedWordsIndexes.push_back(i);
                 int randomVerIndex = randomStrIndex(words[i].answer , words[i].usedLetterIndexed);
-                
-                // std::cout << "random Index" << randomI << "---\n";
+                // std::cout << "random Index" << randomVerIndex << "---\n";
                 // std::cout << "horizontal Index" << horIndex << "---\n";
-                // std::cout << "letter" << words[i].answer << "---\n";
-                // std::cout << "letter" << words[i].answer[randomI] << "---\n";
-                // ! from here
-                fillHorizontal(horIndex, randomVerIndex, &words[i].answer[randomVerIndex]);
-                break;
-            }
-            
+                // std::cout << "word - " << words[i].answer << "---\n";
+                // std::cout << "letter - " << words[i].answer[randomVerIndex] << "---\n";
+                // std::cout << "~~~~~~~~~~~~~~~~~~\n";
+                fillHorizontal(horIndex, randomVerIndex + (verIndex - findedIndex), &words[i].answer[randomVerIndex]);
+            }            
         }
     }
 };
@@ -205,41 +210,68 @@ void Core::fillHorizontal(int horIndex, int verIndex, char *letter) {
             ! containsElement(usedWordsIndexes, i)
         ) {
             findedIndex = words[i].answer.find(*letter);
-
-            words[i].usedLetterIndexed.push_back(i);
-            if (horizontalSuitable(findedIndex, verIndex, &words[i].answer)) {
+            words[i].usedLetterIndexed.push_back(findedIndex);
+            
+            std::cout << "finded_index -- " << findedIndex << "\n";
+            std::cout << "vertical_index -- " << verIndex << "\n";
+            std::cout << "answer -- " << words[i].answer << "\n";
+            
+            std::cout << "fill horizontal\n";
+            if (horizontalSuitable(findedIndex, horIndex, verIndex, words[i].answer)) {
                 for (int j = 0; j < words[i].length; j++) {
-                    table[verIndex + 1][horIndex - findedIndex + j] = words[i].answer[j];
+                    table[verIndex][horIndex - findedIndex + j] = words[i].answer[j];
                 }
-                //! should make word crossing part, and check what is worng.`
                 usedWordsIndexes.push_back(i);
                 int randomHorIndex = randomStrIndex(words[i].answer , words[i].usedLetterIndexed);
-                
-                fillVertical(randomHorIndex , verIndex + 1, &words[i].answer[randomHorIndex]); 
-                break;
+                std::cout << "random Index" << randomHorIndex << "---\n";
+                std::cout << "horizontal Index" << horIndex << "---\n";
+                std::cout << "word - " << words[i].answer << "---\n";
+                std::cout << "letter - " << words[i].answer[randomHorIndex] << "---\n";
+                fillVertical(randomHorIndex + (horIndex - findedIndex)  , verIndex, &words[i].answer[randomHorIndex]); 
             }
         }
     }
 };
 
-bool Core::verticalSuitable(int findedInd, int verInd, std::string *word) {
+bool Core::verticalSuitable(int findedInd, int horInd, int verInd, std::string &word) {
     // TODO check word crossing 
     if (
         verInd > findedInd && 
-        verInd - findedInd + word->size() <= 25/2
-    ) { // 25 / 2 is seted in the main 
+        verInd - findedInd + word.size() <= 25/2
+    ) { // 25 / 2 is seted in the main
+        int j = 0; 
+        for (int i = verInd - findedInd; i < (verInd + word.size()); i++){
+            std::cout << "word is " << word << "\n";
+            std::cout << "table letter --" << table[i][horInd] << "    word letter --- " << word[j] << "\n";
+            if (table[i][horInd] != ' ' && table[i][horInd] != word[j]) {
+                return false;
+            }     
+            j++;       
+        }
+        std::cout << "verticll this word is suitable" <<  word << "\n !=================!\n";
         return true;   
     }
     return false;
 }
 
-bool Core::horizontalSuitable(int findedInd, int horInd, std::string *word) {
+bool Core::horizontalSuitable(int findedInd, int horInd, int verInd, std::string &word) {
     // TODO check word crossing 
     if(
         horInd > findedInd && 
-        horInd - findedInd + word->size() <= 125/4
+        horInd - findedInd + word.size() <= 125/4
     ) { // ! 125 / 4 is seted in the main (change in the future) 
+        int j = 0; 
+        for (int i = horInd - findedInd; i < (horInd + word.size()); i++){
+            std::cout << "==========horizontal============";
+            std::cout << "word is " << word << "\n";
+            std::cout << "table letter --" << table[verInd][i] << "    word letter --- " << word[j] << "\n";
+            if (table[verInd][i] != ' ' && table[verInd][i] != word[j]) {
+                return false;
+            }     
+            j++;
+        }
         return true;
+        std::cout << "this word is suitable horizontally  " <<  word << "\n";
     }
     return false;
 }

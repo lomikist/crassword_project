@@ -1,26 +1,27 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <deque>
 #include <ncurses.h>
 #include "string.h"
 using namespace std;
 class Menu {
 protected:
 public: 
-    Menu(vector<string> );
+    Menu(std::vector<string> );
     ~Menu();
     
-    void setActiveItems(vector<string> );
-    vector<string> getActiveItems();
+    void setActiveItems(std::vector<string> );
+    std::vector<string> getActiveItems();
 
-    vector<string> activeItems;
+    std::vector<string> activeItems;
     // is storing that items which should be shown after left arrow pressing.
-    vector<string> prevActiveItems;
+    std::deque<std::vector<string>> prevActiveItems;
     // which is selected (console || window)
-    string colorOption;
+    std::string colorOption;
 
     WINDOW* mainWindow;
-    string* currentItem;
+    std::string* currentItem;
 
     int height;
     int width;
