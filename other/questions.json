@@ -6,7 +6,7 @@
     },
     {
         "clue": "Chemical compound used as a solvent",
-        "length": 18,
+        "length": 19,
         "answer": "Tetrachloroethylene"
     },
     {
@@ -16,7 +16,7 @@
     },
     {
         "clue": "A circle's outer boundary",
-        "length": 7,
+        "length": 9,
         "answer": "Perimeter"
     },
     {
@@ -61,17 +61,17 @@
     },
     {
         "clue": "The study of celestial objects",
-        "length": 8,
+        "length": 9,
         "answer": "Astronomy"
     },
     {
         "clue": "Imperial unit of distance equal to 1.609 kilometers",
-        "length": 3,
+        "length": 4,
         "answer": "Mile"
     },
     {
         "clue": "A country in the United Kingdom",
-        "length": 6,
+        "length": 5,
         "answer": "Wales"
     },
     {
@@ -86,12 +86,12 @@
     },
     {
         "clue": "The outer layer of the Earth",
-        "length": 4,
+        "length": 5,
         "answer": "Crust"
     },
     {
         "clue": "A shape with four equal sides and four right angles",
-        "length": 4,
+        "length": 6,
         "answer": "Square"
     },
     {
@@ -101,7 +101,7 @@
     },
     {
         "clue": "The largest mammal on Earth",
-        "length": 10,
+        "length": 9,
         "answer": "Bluewhale"
     },
     {
@@ -111,12 +111,12 @@
     },
     {
         "clue": "A celestial body that orbits the Sun",
-        "length": 5,
+        "length": 6,
         "answer": "Planet"
     },
     {
         "clue": "The Greek god of the sea",
-        "length": 4,
+        "length": 8,
         "answer": "Poseidon"
     },
     {
@@ -126,12 +126,12 @@
     },
     {
         "clue": "A natural hot spring that shoots water into the air",
-        "length": 5,
+        "length": 6,
         "answer": "Geyser"
     },
     {
         "clue": "The capital of Italy",
-        "length": 6,
+        "length": 4,
         "answer": "Rome"
     },
     {
@@ -141,7 +141,7 @@
     },
     {
         "clue": "A shape with five sides",
-        "length": 5,
+        "length": 8,
         "answer": "Pentagon"
     },
     {
@@ -171,12 +171,12 @@
     },
     {
         "clue": "The capital of Russia",
-        "length": 8,
+        "length": 6,
         "answer": "Moscow"
     },
     {
         "clue": "The thin layer of gas that surrounds the Earth",
-        "length": 9,
+        "length": 10,
         "answer": "Atmosphere"
     },
     {
@@ -186,8 +186,8 @@
     },
     {
         "clue": "A measurement of distance equal to 1,000 meters",
-        "length": 3,
-        "answer": "Kil"
+        "length": 9,
+        "answer": "Kilometer"
     },
     {
         "clue": "A structure built to allow boats to pass over obstacles",
@@ -206,7 +206,7 @@
     },
     {
         "clue": "The largest moon of Jupiter",
-        "length": 4,
+        "length": 8,
         "answer": "Ganymede"
     },
     {
@@ -216,7 +216,7 @@
     },
     {
         "clue": "The study of the Earth's physical structure and substance",
-        "length": 6,
+        "length": 7,
         "answer": "Geology"
     },
     {
@@ -241,7 +241,7 @@
     },
     {
         "clue": "A figure with six sides",
-        "length": 6,
+        "length": 7,
         "answer": "Hexagon"
     },
     {
@@ -255,16 +255,10 @@
         "answer": "Moon"
     },
     {
-        "clue": "The chemical symbol for helium",
-        "length": 2,
-        "answer": "He"
-    },
-    {
         "clue": "Earth's natural satellite",
         "length": 4,
         "answer": "Moon"
     },
-    
     {
         "clue": "The study of heavenly bodies",
         "length": 5,
