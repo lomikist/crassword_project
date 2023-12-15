@@ -72,9 +72,12 @@ void Gui::drawQuestions(const std::vector<Word> & list, const std::vector<int>  
     int showIndex = 0;
     for(int i = 0; i < indexes.size(); ++i){
         mvwprintw(this->gameBoard->questWindow, 1 + i, 1,
-                                                "%d) %s",
+                                                "%d) %s - [size - %d]  [start (%d,%d)]",
                                                 i + 1,
-                                                list[indexes[i]].question.c_str()
+                                                list[indexes[i]].question.c_str(),
+                                                list[indexes[i]].length,
+                                                list[indexes[i]].xCord,
+                                                list[indexes[i]].yCord
                 );
     }
     wrefresh(this->gameBoard->questWindow);

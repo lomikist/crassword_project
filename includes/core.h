@@ -15,7 +15,6 @@ private:
     std::vector<Word> words;
 public:
     Core(int = 30, int = 30);
-    ~Core();
     void detecting_key();
     void startGame();
     std::vector<std::vector<char>> table;
@@ -27,8 +26,8 @@ private:
     int longestIndex;
     int longestSize;
     
-    void fillVertical(int, int, char*);
-    void fillHorizontal(int, int, char*);
+    void fillVertical(int, int, char &);
+    void fillHorizontal(int, int, char &);
     void setColor();
     bool verticalSuitable(int ,int, int, std::string &);
     bool horizontalSuitable(int, int, int, std::string &);
