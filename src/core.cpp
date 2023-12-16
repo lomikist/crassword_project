@@ -19,6 +19,7 @@ Core::Core(int verCount, int horCount) {
             row.push_back(' ');
         }
         this->table.push_back(row);
+        this->showTable.push_back(row);
     }
 
     this->fillWords();
@@ -39,21 +40,35 @@ void Core::startGame(){
             this->user_interface->changeItem(1);
         } else if ( key == 10 ){
             if ( *this->user_interface->menu->currentItem == "start"){
-                int entered;
-                // this->user_interface->clearScreen();
+                this->user_interface->drawBoadr(this->showTable);
+                // this->user_interface->drawBoadr(this->table);
                 do {
-                    int a, b;
-                    this->user_interface->drawBoadr(this->table);
+                    std::pair<int, int> cords(0, 0);
+                    char letter;
                     this->user_interface->drawQuestions(this->words, this->usedWordsIndexes);
+                    this->user_interface->drawInput();
+                    do {
+                        cords.second = this->user_interface->getDecimalNumber("x") - 1;
+                        this->user_interface->printErrors("Your entered number is bigger than count of col.");
+                    } while (cords.second < 0 || cords.second > table[0].size());
+                    do {
+                        cords.first = this->user_interface->getDecimalNumber("y") - 1;
+                        this->user_interface->printErrors("Your entered number is bigger than count of row.");
+                    } while (cords.first < 0 || cords.first > table.size());
+                    do {
+                        letter = wgetch(this->user_interface->gameBoard->inputWindow);
+                    } while (letter < 'a' && letter > 'z');
 
-                    a = this->user_interface->getDecimalNumber();
-                    b = this->user_interface->getDecimalNumber();
-
-                    this->table[a - 1][b - 1] = 'd';
+                    this->showTable[cords.first][cords.second] = letter;
+                    if (this->showTable[cords.first][cords.second] == this->table[cords.first][cords.second]){
+                        this->user_interface->drawChangedBoard(this->showTable, cords, true);
+                    }else {
+                        this->user_interface->drawChangedBoard(this->showTable, cords, false);
+                    }
                     this->user_interface->clearWindow(this->user_interface->menu->mainWindow);
-                    
+
                     wrefresh(this->user_interface->gameBoard->mainWindow);
-                } while ( entered != 'q');              
+                } while ( 1 );//some condition for             
             }
             else if ( *this->user_interface->menu->currentItem == "how control" )
             {
@@ -161,6 +176,7 @@ void Core::fillTable(){
         int k = table.size();
         int m = table[5].size();
         table[words[longestIndex].yCord][words[longestIndex].xCord + i] = words[longestIndex].answer[i];
+        showTable[words[longestIndex].yCord][words[longestIndex].xCord + i] = words[longestIndex].answer[i];
     }
     
     int randomIndex = randomStrIndex(words[longestIndex].answer, words[longestIndex].usedLetterIndexed);
@@ -169,7 +185,6 @@ void Core::fillTable(){
         randomIndex = randomStrIndex(words[longestIndex].answer, words[longestIndex].usedLetterIndexed);
         fillVertical(randomIndex, words[longestIndex].yCord, words[longestIndex].answer[randomIndex]);
     }
-    
 }
 
 void Core::fillVertical(int horIndex, int verIndex, char &letter){
@@ -184,11 +199,13 @@ void Core::fillVertical(int horIndex, int verIndex, char &letter){
             words[i].usedLetterIndexed.push_back(findedIndex);
             if (verticalSuitable(findedIndex, horIndex, verIndex, words[i].answer)) {
                 for (int j = 0; j < words[i].length; j++) {
-                    words[i].yCord = verIndex - findedIndex + 1;
-                    words[i].xCord = horIndex + 1;
                     table[verIndex - findedIndex + j][horIndex] = words[i].answer[j];
                 }
+                words[i].yCord = verIndex - findedIndex + 1;
+                words[i].xCord = horIndex + 1;
+                words[i].direction = "down";
                 usedWordsIndexes.push_back(i);
+                
                 int randomVerIndex = randomStrIndex(words[i].answer , words[i].usedLetterIndexed);
                 fillHorizontal(horIndex, randomVerIndex + (verIndex - findedIndex), words[i].answer[randomVerIndex]);
             }            
@@ -207,11 +224,13 @@ void Core::fillHorizontal(int horIndex, int verIndex, char &letter) {
             words[i].usedLetterIndexed.push_back(findedIndex);
             if (horizontalSuitable(findedIndex, horIndex, verIndex, words[i].answer)) {
                 for (int j = 0; j < words[i].length; j++) {
-                    words[i].xCord = verIndex + 1;
-                    words[i].yCord = horIndex - findedIndex + 1;
                     table[verIndex][horIndex - findedIndex + j] = words[i].answer[j];
                 }
+                words[i].direction = "right";
+                words[i].xCord = verIndex + 1;
+                words[i].yCord = horIndex - findedIndex + 1;
                 usedWordsIndexes.push_back(i);
+
                 int randomHorIndex = randomStrIndex(words[i].answer , words[i].usedLetterIndexed);
                 fillVertical(randomHorIndex + (horIndex - findedIndex)  , verIndex, words[i].answer[randomHorIndex]); 
             }
@@ -225,7 +244,8 @@ bool Core::verticalSuitable(int findedInd, int horInd, int verInd, std::string &
         verInd - findedInd + word.size() <= 25/2
     ) { // 25 / 2 is seted in the main
         int j = 0; 
-        for (int i = verInd - findedInd; i < (verInd + word.size()); i++) {
+        //! Problem are here
+        for (int i = verInd - findedInd; i < (verInd - findedInd + word.size()); i++) {
             if (table[i][horInd] != ' ' && table[i][horInd] != word[j]) {
                 return false;
             }     
@@ -242,17 +262,13 @@ bool Core::horizontalSuitable(int findedInd, int horInd, int verInd, std::string
         horInd - findedInd + word.size() <= 125/4
     ) { // ! 125 / 4 is seted in the main (change in the future) 
         int j = 0; 
-        for (int i = horInd - findedInd; i < (horInd + word.size()); i++){
-            std::cout << "==========horizontal============";
-            std::cout << "word is " << word << "\n";
-            std::cout << "table letter --" << table[verInd][i] << "    word letter --- " << word[j] << "\n";
+        for (int i = horInd - findedInd; i < (horInd - findedInd + word.size()); i++){
             if (table[verInd][i] != ' ' && table[verInd][i] != word[j]) {
                 return false;
             }     
             j++;
         }
         return true;
-        std::cout << "this word is suitable horizontally  " <<  word << "\n";
     }
     return false;
 }

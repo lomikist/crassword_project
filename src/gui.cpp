@@ -39,6 +39,11 @@ void Gui::drawMenu(int height, int width){
     wrefresh(this->menu->mainWindow);
 }
 
+void Gui::drawInput(){
+
+    wrefresh(this->gameBoard->inputWindow);
+}
+
 void Gui::changeItem(int key){
     // for down
     if ( key == 1 && this->menu->currentItem != &this->menu->activeItems[this->menu->activeItems.size() - 1] ) {
@@ -49,14 +54,15 @@ void Gui::changeItem(int key){
     }
 }
 
-void Gui::drawBoadr( std::vector < std::vector < char > > & table){
+void Gui::drawBoadr(std::vector<std::vector<char>> & table){
     box(this->gameBoard->mainWindow, 0, 0);
 
     for (int i = 0; i < table.size(); ++i) {
         for (int j = 0; j < table[i].size(); ++j) {
-            // mvwprintw(this->gameBoard->mainWindow, 1 + j * 4, 1 + i * 4, "%d", counter);
-            // print a char from the board ( 2 + becaues each field is 3 spaces and 1 spase is line)
+            // wattron(this->gameBoard->mainWindow, COLOR_PAIR(7));
             mvwaddch(this->gameBoard->mainWindow, 1 + i * 2, 2 + j * 4, table[i][j]);
+            // wattroff(this->gameBoard->mainWindow, COLOR_PAIR(7));
+            // wattron(this->gameBoard->mainWindow, COLOR_PAIR(1));
         }
     }   
 
@@ -66,18 +72,32 @@ void Gui::drawBoadr( std::vector < std::vector < char > > & table){
     wrefresh(this->gameBoard->mainWindow);
 }
 
+void Gui::drawChangedBoard(std::vector<std::vector<char>> & table, std::pair<int,int> &cords, bool flag) {
+    if (flag)
+        wattron(this->gameBoard->mainWindow, COLOR_PAIR(8));
+    else 
+        wattron(this->gameBoard->mainWindow, COLOR_PAIR(7));
+
+    mvwaddch(this->gameBoard->mainWindow, 1 + cords.first * 2, 2 + cords.second * 4, table[cords.first][cords.second]);
+
+    if (flag)
+        wattroff(this->gameBoard->mainWindow, COLOR_PAIR(8));
+    else 
+        wattroff(this->gameBoard->mainWindow, COLOR_PAIR(7));}
+
 void Gui::drawQuestions(const std::vector<Word> & list, const std::vector<int>  &indexes) { 
     box(this->gameBoard->questWindow, '*', '*');
     
     int showIndex = 0;
     for(int i = 0; i < indexes.size(); ++i){
         mvwprintw(this->gameBoard->questWindow, 1 + i, 1,
-                                                "%d) %s - [size - %d]  [start (%d,%d)]",
+                                                "%d) %s - [start (%d,%d)] [end (%d,%d)]",
                                                 i + 1,
                                                 list[indexes[i]].question.c_str(),
-                                                list[indexes[i]].length,
                                                 list[indexes[i]].xCord,
-                                                list[indexes[i]].yCord
+                                                list[indexes[i]].yCord,
+                                                list[indexes[i]].xCord + (list[indexes[i]].direction == "right" ? list[indexes[i]].length : 0),
+                                                list[indexes[i]].yCord + (list[indexes[i]].direction == "down" ? list[indexes[i]].length : 0)
                 );
     }
     wrefresh(this->gameBoard->questWindow);
@@ -111,16 +131,29 @@ int Gui::detectConrtolKeys(){
     return 0;
 }
 
-int Gui::getDecimalNumber(){
-    int input, number = 0;
+int Gui::getDecimalNumber(const std::string &turn){
+    int input = 0;
+    int number = 0;
+
+    this->clearWindow(this->gameBoard->inputWindow);
+    box(this->gameBoard->inputWindow, 0, 0);
     do {
         input = getch();
-        // take a input from user and convert it to number , if assci code between 9 and 1.
+        // take a input from user and convert it to number the case if assci code between 9 and 1.
+        int j = 0;
         if (input <= '9' && input >= '1') {
             number = number * 10 + input - '0';
+            if (turn == "y")
+                mvwprintw(this->gameBoard->inputWindow, 1, 1, "y - %d", number);
+            else if (turn == "x")
+                mvwprintw(this->gameBoard->inputWindow, 1, 1, "x - %d", number);
+            j++;
         }
+        wrefresh(this->gameBoard->inputWindow);
     } while (input != 10);
-    return number;
+    this->clearWindow(this->gameBoard->inputWindow);
+    this->verHorTurn = !this->verHorTurn;
+    return number == 0 ? 1 : number;
 }
 
 void Gui::initMenu(int height, int width)
@@ -138,11 +171,12 @@ void Gui::initMenu(int height, int width)
 void Gui::initGameBoard(int verCount, int horCount)
 {
     this->gameBoard = new Board(verCount, horCount);
-    int y = 0;
-    int x = (Gui::windowWidth - this->gameBoard->sizes.second) / 2;
-    this->gameBoard->mainWindow = newwin(this->gameBoard->sizes.first, this->gameBoard->sizes.second, y, x);
-    this->gameBoard->questWindow = newwin(Gui::windowHeight - this->gameBoard->sizes.first, this->gameBoard->sizes.second, y + this->gameBoard->sizes.first, x);
-}
+    int y = 1;
+    int x = (Gui::windowWidth - this->gameBoard->sizes.second);
+    this->gameBoard->mainWindow = newwin(this->gameBoard->sizes.first , this->gameBoard->sizes.second, y, x);
+    this->gameBoard->questWindow = newwin(Gui::windowHeight - this->gameBoard->sizes.first - y, this->gameBoard->sizes.second, this->gameBoard->sizes.first + y, x);
+    this->gameBoard->inputWindow = newwin(this->gameBoard->sizes.first, x, 1, 0);
+}   
 
 void Gui::clearScreen(){
     clear();
@@ -171,6 +205,10 @@ void Gui::initScreen() {
     init_pair(4, COLOR_WHITE, COLOR_GREEN);
     init_pair(5, COLOR_WHITE, COLOR_MAGENTA);
     init_pair(6, COLOR_WHITE, COLOR_CYAN);
+    
+    init_pair(7, COLOR_RED, COLOR_BLACK);
+    init_pair(8, COLOR_GREEN, COLOR_BLACK);
+    init_pair(9, COLOR_WHITE, COLOR_BLACK);
 }
 
 void Gui::changeConsoleColor(const int pairIndex) {
@@ -181,4 +219,8 @@ void Gui::changeWindowColor(const int pairIndex) {
     wbkgd(this->menu->mainWindow, COLOR_PAIR(pairIndex));
     wbkgd(this->gameBoard->mainWindow, COLOR_PAIR(pairIndex));
     wbkgd(this->gameBoard->questWindow, COLOR_PAIR(pairIndex));
+}
+
+void Gui::printErrors(const std::string &error) {
+    mvwprintw(this->gameBoard->inputWindow, 1, 1, error.c_str());
 }

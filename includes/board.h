@@ -15,4 +15,5 @@ public:
     std::pair<int, int> sizes;
     WINDOW* mainWindow;
     WINDOW* questWindow;
+    WINDOW* inputWindow;
 };

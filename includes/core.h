@@ -18,6 +18,7 @@ public:
     void detecting_key();
     void startGame();
     std::vector<std::vector<char>> table;
+    std::vector<std::vector<char>> showTable;
     Model* model;
     void fillTable();
     std::vector<int> usedWordsIndexes; 

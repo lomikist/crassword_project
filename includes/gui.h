@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <ncurses.h>
+#include <utility>
 #include "menu.h"
 #include "board.h"
 #include "word.h"
@@ -17,6 +18,8 @@ public:
 
     static int windowHeight;
     static int windowWidth;
+
+    int verHorTurn = 0;
 public:
     Gui(int, int);
     ~Gui();
@@ -26,17 +29,20 @@ public:
     void changeWindowColor(const int);
 
     void drawBoadr(std::vector<std::vector<char>>& );
+    void drawChangedBoard(std::vector<std::vector<char>>& , std::pair<int, int>& , bool);
     void drawQuestions(const std::vector<Word> &, const std::vector<int> &);
+    void drawInput();
 
-    void initScreen();
-    void drawMenu(int,int);
-    void drawVerticalLines();
-    void drawHorizontalLines();
-    int detectConrtolKeys();
-    void clearScreen();
-    int getDecimalNumber();
-    void initMenu(int, int);
-    void initGameBoard(int, int);
-    void initQuestBoard(int, int);
-    void clearWindow(WINDOW *);
+    void    initScreen();
+    void    drawMenu(int,int);
+    void    drawVerticalLines();
+    void    drawHorizontalLines();
+    int     detectConrtolKeys();
+    void    clearScreen();
+    int     getDecimalNumber(const std::string &);
+    void    printErrors(const std::string &);
+    void    initMenu(int, int);
+    void    initGameBoard(int, int);
+    void    initQuestBoard(int, int);
+    void    clearWindow(WINDOW *);
 };
