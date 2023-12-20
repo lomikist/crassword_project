@@ -24,19 +24,23 @@ public:
     Gui(int, int);
     ~Gui();
     static void adjustScreenSize();
-    void changeItem(int );
-    void changeConsoleColor(const int);
-    void changeWindowColor(const int);
+    void    changeItem(int );
+    void    changeConsoleColor(const int);
+    void    changeWindowColor(const int);
 
-    void drawBoadr(std::vector<std::vector<char>>& );
-    void drawChangedBoard(std::vector<std::vector<char>>& , std::pair<int, int>& , bool);
-    void drawQuestions(const std::vector<Word> &, const std::vector<int> &);
-    void drawInput();
-
-    void    initScreen();
-    void    drawMenu(int,int);
+    void    drawBoadr(std::vector<std::vector<char>>& );
+    void    drawChangedBoard(std::vector<std::vector<char>>& , std::pair<int, int>& , bool);
+    void    drawQuestions(const std::vector<Word> &, const std::vector<int> &);
+    void    drawInput();
     void    drawVerticalLines();
     void    drawHorizontalLines();
+    void    drawWinWindow();
+
+
+    void    initScreen();
+    std::pair<int, int>  getKeyCords();
+    void    drawSelectedField(const std::pair<int, int> &);
+    void    drawMenu(int,int);
     int     detectConrtolKeys();
     void    clearScreen();
     int     getDecimalNumber(const std::string &);
@@ -45,4 +49,5 @@ public:
     void    initGameBoard(int, int);
     void    initQuestBoard(int, int);
     void    clearWindow(WINDOW *);
+    std::pair<int, int> getMouseCords(WINDOW *);
 };
