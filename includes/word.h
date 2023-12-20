@@ -17,8 +17,9 @@ public:
     int length;
     std::string answer;
     std::string question;
-    std::string direction;//! not neded for now
+    std::string direction;
     std::vector<int> usedLetterIndexed;
+    bool filled = false;
 public:
     bool checkAnswer(const std::string& aswer);
 };

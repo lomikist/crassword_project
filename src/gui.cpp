@@ -40,7 +40,6 @@ void Gui::drawMenu(int height, int width){
 }
 
 void Gui::drawInput(){
-
     wrefresh(this->gameBoard->inputWindow);
 }
 
@@ -89,17 +88,27 @@ void Gui::drawChangedBoard(std::vector<std::vector<char>> & table, std::pair<int
 void Gui::drawQuestions(const std::vector<Word> & list, const std::vector<int>  &indexes) { 
     box(this->gameBoard->questWindow, '*', '*');
     
+
     int showIndex = 0;
     for(int i = 0; i < indexes.size(); ++i){
+        if (list[indexes[i]].filled)
+            wattron(this->gameBoard->questWindow, COLOR_PAIR(8));
+        else 
+            wattron(this->gameBoard->questWindow, COLOR_PAIR(7));
         mvwprintw(this->gameBoard->questWindow, 1 + i, 1,
-                                                "%d) %s - [start (%d,%d)] [end (%d,%d)]",
+                                                "%d) %s - [start (%d,%d)] [end (%d,%d)] [%c]",
                                                 i + 1,
                                                 list[indexes[i]].question.c_str(),
-                                                list[indexes[i]].xCord,
-                                                list[indexes[i]].yCord,
-                                                list[indexes[i]].xCord + (list[indexes[i]].direction == "right" ? list[indexes[i]].length - 1 : 0),
-                                                list[indexes[i]].yCord + (list[indexes[i]].direction == "down" ? list[indexes[i]].length - 1 : 0) 
+                                                list[indexes[i]].xCord + 1,
+                                                list[indexes[i]].yCord + 1,
+                                                list[indexes[i]].xCord + 1 + (list[indexes[i]].direction == "right" ? (list[indexes[i]].length - 1) : 0),
+                                                list[indexes[i]].yCord + 1 + (list[indexes[i]].direction == "right" ? 0 : (list[indexes[i]].length - 1)),
+                                                list[indexes[i]].filled ? '+' : '-'
                 );
+        if (list[indexes[i]].filled)
+            wattroff(this->gameBoard->questWindow, COLOR_PAIR(8));
+        else 
+            wattroff(this->gameBoard->questWindow, COLOR_PAIR(7));
     }
     wrefresh(this->gameBoard->questWindow);
 }
@@ -204,7 +213,7 @@ void Gui::initScreen() {
     cbreak();
     noecho();
     keypad(stdscr, true);
-    // mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
+    mousemask(BUTTON1_CLICKED , NULL);
     if (!has_colors()) {
         endwin();
         printf("Bratan your teminal dose not support colors.\n");
@@ -237,21 +246,38 @@ void Gui::changeWindowColor(const int pairIndex) {
 }
 
 void Gui::printErrors(const std::string &error) {
-    mvwprintw(this->gameBoard->inputWindow, 1, 1, error.c_str());
+    mvwprintw(this->gameBoard->inputWindow, 1, 1, "Error: %s", error.c_str());
 }
 
-std::pair<int, int> Gui::getMouseCords(WINDOW *win){
+std::pair<int, int> Gui::getMouseCords(){
     std::pair <int, int> cords (0,0);
     int ch;
-
     do{
-        ch = wgetch(win);
+        MEVENT event;
+        ch = getch();
         if (ch == KEY_MOUSE) {
-            MEVENT event;
-            
+            if (getmouse(&event) == OK) {
+                cords.first = event.y;
+                cords.second = event.x;
+            }
         } 
-    } while (ch != KEY_MOUSE);
+    } while (!this->insideWindow(Gui::windowWidth - this->gameBoard->sizes.second, 1, this->gameBoard->sizes.second, this->gameBoard->sizes.first, cords));
+    cords.second = (cords.second - (Gui::windowWidth - this->gameBoard->sizes.second)) / 4;
+    cords.first = (cords.first - 1) / 2; 
+
     return cords;
+}
+
+bool Gui::insideWindow(int x, int y, int  width, int height, std::pair<int, int> cords)
+{
+    // cords (y,x)
+
+    if(cords.second > x + width || cords.second < x 
+    && cords.first > y + height || cords.first < y)
+    {
+        return false;
+    }
+    return true;
 }
 
 std::pair<int, int> Gui::getKeyCords() {

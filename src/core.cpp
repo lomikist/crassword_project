@@ -5,7 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <random>
-
+#define QUESTION_COUNT 10
 Core::Core(int verCount, int horCount) {
     this->model = new Model();
 
@@ -27,7 +27,7 @@ Core::Core(int verCount, int horCount) {
     this->user_interface = new Gui( verCount, horCount );
 }
 
-void Core::startGame(){
+int Core::startGame(){
     this->user_interface->adjustScreenSize();
     int key = 0;
     do {
@@ -53,7 +53,7 @@ void Core::startGame(){
             else if (*this->user_interface->menu->currentItem == "exit")
             {
                 endwin();
-                abort();
+                return FALSE;
             }
             else if ( *this->user_interface->menu->currentItem == "console" || 
                         *this->user_interface->menu->currentItem == "window" )
@@ -98,7 +98,7 @@ void Core::getCords(std::pair<int, int> &cords) {
     {
         cords = this->user_interface->getKeyCords();
     } else if (this->controlType == "mouse") {
-        // cords = this->user_interface->getCursorPos(this->user_interface->gameBoard->mainWindow);
+        cords = this->user_interface->getMouseCords();
     }
 }
 
@@ -166,6 +166,7 @@ void Core::fillWords(){
 void Core::fillTable(){
     words[longestIndex].xCord = 0;
     words[longestIndex].yCord = 5;
+    words[longestIndex].direction = "right";
 
     for(int i = 0; i < words[longestIndex].answer.length(); ++i){
         int k = table.size();
@@ -176,7 +177,7 @@ void Core::fillTable(){
     this->usedWordsIndexes.push_back(longestIndex);
 
     int randomIndex = randomStrIndex(words[longestIndex].answer, words[longestIndex].usedLetterIndexed);
-    while (usedWordsIndexes.size() <= 1)
+    while (usedWordsIndexes.size() < QUESTION_COUNT)
     {
         randomIndex = randomStrIndex(words[longestIndex].answer, words[longestIndex].usedLetterIndexed);
         fillVertical(randomIndex, words[longestIndex].yCord, words[longestIndex].answer[randomIndex]);
@@ -197,14 +198,17 @@ void Core::fillVertical(int horIndex, int verIndex, char &letter){
                 for (int j = 0; j < words[i].length; j++) {
                     table[verIndex - findedIndex + j][horIndex] = words[i].answer[j];
                 }
-                words[i].yCord = verIndex - findedIndex + 1;
-                words[i].xCord = horIndex + 1;
+                words[i].yCord = verIndex - findedIndex;
+                words[i].xCord = horIndex;
                 words[i].direction = "down";
                 usedWordsIndexes.push_back(i);
                 
                 int randomVerIndex = randomStrIndex(words[i].answer , words[i].usedLetterIndexed);
-                fillHorizontal(horIndex, randomVerIndex + (verIndex - findedIndex), words[i].answer[randomVerIndex]);
-            }            
+                if (usedWordsIndexes.size() < QUESTION_COUNT)
+                {
+                    fillHorizontal(horIndex, randomVerIndex + (verIndex - findedIndex), words[i].answer[randomVerIndex]);
+                }   
+            }         
         }
     }
 };
@@ -222,13 +226,16 @@ void Core::fillHorizontal(int horIndex, int verIndex, char &letter) {
                 for (int j = 0; j < words[i].length; j++) {
                     table[verIndex][horIndex - findedIndex + j] = words[i].answer[j];
                 }
+                words[i].yCord = verIndex;
+                words[i].xCord = horIndex - findedIndex;
                 words[i].direction = "right";
-                words[i].xCord = verIndex + 1;
-                words[i].yCord = horIndex - findedIndex + 1;
                 usedWordsIndexes.push_back(i);
 
                 int randomHorIndex = randomStrIndex(words[i].answer , words[i].usedLetterIndexed);
-                fillVertical(randomHorIndex + (horIndex - findedIndex)  , verIndex, words[i].answer[randomHorIndex]); 
+                if (usedWordsIndexes.size() < QUESTION_COUNT)
+                {
+                    fillVertical(randomHorIndex + (horIndex - findedIndex), verIndex, words[i].answer[randomHorIndex]); 
+                }
             }
         }
     }
@@ -289,23 +296,58 @@ int Core::randomStrIndex(std::string& string, std::vector<int>& existIndexes) {
 }
 
 bool Core::compareTables(const std::vector<std::vector<char>>& table, const std::vector<std::vector<char>>& showTable) {
-    if (table.size() != showTable.size())
-        return false;
-    for (size_t i = 0; i < table.size(); ++i) {
-        if (table[i].size() != showTable[i].size())
-            return false;
-        for (size_t j = 0; j < table[i].size(); ++j) {
-            if (table[i][j] != showTable[i][j]) {
-                return false;
+    bool flag = true;
+    for (auto item : this->usedWordsIndexes)
+    {
+        if (this->words[item].direction == "right")
+        {
+            if (!this->chekcHorizontal(item))   
+            {
+                flag = false;
             }
+        } else if (this->words[item].direction == "down")
+        {
+            if (!this->checkVertical(item))
+            {
+                flag = false;
+            } 
         }
     }
+    return flag;
+}
+
+bool Core::checkVertical(int index)
+{
+    for (size_t i = 0; i < words[index].length; i++)
+    {
+        if (this->showTable[words[index].yCord + i][words[index].xCord] != words[index].answer[i])
+        {
+            this->words[index].filled = false;
+            return false;
+        }
+    }
+    this->words[index].filled = true;
+    return true;
+}
+
+bool Core::chekcHorizontal(int index)
+{    
+    for (size_t i = 0; i < words[index].length; i++)
+    {
+        if (showTable[words[index].yCord][words[index].xCord + i] != words[index].answer[i])
+        {
+            this->words[index].filled = false;
+            return false;
+        }
+    }
+    this->words[index].filled = true;
     return true;
 }
 
 void Core::menuStartCase()
 {
     this->user_interface->drawBoadr(this->showTable);
+    // this->user_interface->drawBoadr(this->table);
     do {
         std::pair<int, int> cords(0, 0);
         char letter;
@@ -327,15 +369,15 @@ void Core::menuStartCase()
         }
         this->user_interface->clearWindow(this->user_interface->menu->mainWindow);
         wrefresh(this->user_interface->gameBoard->mainWindow);
-    } while (this->compareTables(this->table, this->showTable));
+    } while (!this->compareTables(this->table, this->showTable));
+    // } while (this->compareTables(this->table, this->showTable));
 
     int k;
-    do
-    {
+    do {
         k = getch();
         this->user_interface->drawWinWindow();
     } while (k != 'q');
     clear();
     this->user_interface->menu->prevActiveItems.clear();
-    this->chngeMenuState({"play again"});
+    this->chngeMenuState({"play again", "exit"});
 }

@@ -9,7 +9,6 @@ class Menu {
 protected:
 public: 
     Menu(std::vector<string> );
-    ~Menu();
     
     void setActiveItems(std::vector<string> );
     std::vector<string> getActiveItems();

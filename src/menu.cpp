@@ -6,10 +6,6 @@ Menu::Menu(vector<string> options){
     this->currentItem = &this->activeItems[0];
 }
 
-Menu::~Menu(){
-
-}
-
 vector<string> Menu::getActiveItems()
 {
     return this->activeItems;

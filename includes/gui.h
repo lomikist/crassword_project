@@ -49,5 +49,7 @@ public:
     void    initGameBoard(int, int);
     void    initQuestBoard(int, int);
     void    clearWindow(WINDOW *);
-    std::pair<int, int> getMouseCords(WINDOW *);
+    std::pair<int, int> getMouseCords();
+private:
+    bool    insideWindow(int , int , int , int , std::pair<int, int> );
 };

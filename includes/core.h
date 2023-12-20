@@ -17,7 +17,7 @@ private:
 public:
     Core(int = 30, int = 30);
     void detecting_key();
-    void startGame();
+    int startGame();
     void fillTable();
     void getCords(std::pair<int, int> &);
 
@@ -38,6 +38,9 @@ private:
     void menuStartCase();
     void chngeMenuState(const std::vector<std::string>);
     void chngeMenuState();
+    bool chekcHorizontal(int);
+    bool checkVertical(int);
+
 
     bool containsElement(std::vector<int> &, int &);
     int randomStrIndex(std::string &, std::vector<int> &);
