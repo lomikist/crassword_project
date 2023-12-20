@@ -39,72 +39,67 @@ void Core::startGame(){
             // For changing a pointer selection to one level down
             this->user_interface->changeItem(1);
         } else if ( key == 10 ){
-            if ( *this->user_interface->menu->currentItem == "start"){
-                this->user_interface->drawBoadr(this->showTable);
-                // this->user_interface->drawBoadr(this->table);
-                do {
-                    std::pair<int, int> cords(0, 0);
-                    char letter;
-                    this->user_interface->drawQuestions(this->words, this->usedWordsIndexes);
-                    this->user_interface->drawInput();
-                    do {
-                        cords.second = this->user_interface->getDecimalNumber("x") - 1;
-                        this->user_interface->printErrors("Your entered number is bigger than count of col.");
-                    } while (cords.second < 0 || cords.second > table[0].size());
-                    do {
-                        cords.first = this->user_interface->getDecimalNumber("y") - 1;
-                        this->user_interface->printErrors("Your entered number is bigger than count of row.");
-                    } while (cords.first < 0 || cords.first > table.size());
-                    do {
-                        letter = wgetch(this->user_interface->gameBoard->inputWindow);
-                    } while (letter < 'a' && letter > 'z');
-
-                    this->showTable[cords.first][cords.second] = letter;
-                    if (this->showTable[cords.first][cords.second] == this->table[cords.first][cords.second]){
-                        this->user_interface->drawChangedBoard(this->showTable, cords, true);
-                    }else {
-                        this->user_interface->drawChangedBoard(this->showTable, cords, false);
-                    }
-                    this->user_interface->clearWindow(this->user_interface->menu->mainWindow);
-
-                    wrefresh(this->user_interface->gameBoard->mainWindow);
-                } while ( 1 );//some condition for             
+            if (*this->user_interface->menu->currentItem == "start"){
+                this->menuStartCase();
             }
-            else if ( *this->user_interface->menu->currentItem == "how control" )
+            else if (*this->user_interface->menu->currentItem == "how control")
             {
-                this->user_interface->menu->prevActiveItems.push_back({"Its your problem"});
-                this->user_interface->menu->activeItems = this->user_interface->menu->prevActiveItems.back();
-                this->user_interface->menu->currentItem = &this->user_interface->menu->activeItems[0];
+                this->chngeMenuState({"mouse", "keyboard"});
             }
-            else if ( *this->user_interface->menu->currentItem == "color" )
+            else if (*this->user_interface->menu->currentItem == "color")
             {
-                this->user_interface->menu->prevActiveItems.push_back({"console", "window"});
-                this->user_interface->menu->activeItems = this->user_interface->menu->prevActiveItems.back();
-                this->user_interface->menu->currentItem = &this->user_interface->menu->activeItems[0];
+                this->chngeMenuState({"console", "window"});
             }
-            else if ( *this->user_interface->menu->currentItem == "exit" )
+            else if (*this->user_interface->menu->currentItem == "exit")
             {
                 endwin();
                 abort();
-            } else if ( *this->user_interface->menu->currentItem == "console" || 
-                        *this->user_interface->menu->currentItem == "window" ) {
+            }
+            else if ( *this->user_interface->menu->currentItem == "console" || 
+                        *this->user_interface->menu->currentItem == "window" )
+            {
                 this->user_interface->menu->colorOption = *this->user_interface->menu->currentItem;
-                this->user_interface->menu->prevActiveItems.push_back({"black", "red", "blue", "cyan", "green", "magenta"});
-                this->user_interface->menu->activeItems = this->user_interface->menu->prevActiveItems.back();
-                this->user_interface->menu->currentItem = &this->user_interface->menu->activeItems[0];
+                this->chngeMenuState({"black", "red", "blue", "cyan", "green", "magenta"});
+            }
+            else if ( *this->user_interface->menu->currentItem == "mouse" || 
+                        *this->user_interface->menu->currentItem == "keyboard" ) {
+                this->controlType = *this->user_interface->menu->currentItem;
+                this->chngeMenuState();
             } else {
                 this->setColor();
             }
         } else if (key == KEY_LEFT && this->user_interface->menu->prevActiveItems.size() > 1){
-            this->user_interface->menu->prevActiveItems.pop_back();
-            this->user_interface->menu->activeItems = this->user_interface->menu->prevActiveItems.back();
-            this->user_interface->menu->currentItem = &this->user_interface->menu->activeItems[0];
+            this->chngeMenuState();
         }
         this->user_interface->clearWindow(this->user_interface->menu->mainWindow);
         this->user_interface->drawMenu(this->user_interface->menu->height, this->user_interface->menu->width);
     } while (key != 'q');
     refresh();
     endwin();
+}
+
+void Core::chngeMenuState(const std::vector<std::string> options)
+{
+    this->user_interface->menu->prevActiveItems.push_back(options);
+    this->user_interface->menu->activeItems = this->user_interface->menu->prevActiveItems.back();
+    this->user_interface->menu->currentItem = &this->user_interface->menu->activeItems[0];
+}
+
+void Core::chngeMenuState()
+{
+    this->user_interface->menu->prevActiveItems.pop_back();
+    this->user_interface->menu->activeItems = this->user_interface->menu->prevActiveItems.back();
+    this->user_interface->menu->currentItem = &this->user_interface->menu->activeItems[0];
+}
+
+void Core::getCords(std::pair<int, int> &cords) {
+    // TODO make same thing without useing if else(by controlType obj {should be created})
+    if(this->controlType == "keyboard")
+    {
+        cords = this->user_interface->getKeyCords();
+    } else if (this->controlType == "mouse") {
+        // cords = this->user_interface->getCursorPos(this->user_interface->gameBoard->mainWindow);
+    }
 }
 
 void Core::setColor(){
@@ -178,9 +173,10 @@ void Core::fillTable(){
         table[words[longestIndex].yCord][words[longestIndex].xCord + i] = words[longestIndex].answer[i];
         showTable[words[longestIndex].yCord][words[longestIndex].xCord + i] = words[longestIndex].answer[i];
     }
-    
+    this->usedWordsIndexes.push_back(longestIndex);
+
     int randomIndex = randomStrIndex(words[longestIndex].answer, words[longestIndex].usedLetterIndexed);
-    while (usedWordsIndexes.size() < 9)
+    while (usedWordsIndexes.size() <= 1)
     {
         randomIndex = randomStrIndex(words[longestIndex].answer, words[longestIndex].usedLetterIndexed);
         fillVertical(randomIndex, words[longestIndex].yCord, words[longestIndex].answer[randomIndex]);
@@ -290,4 +286,56 @@ int Core::randomStrIndex(std::string& string, std::vector<int>& existIndexes) {
     } else{ 
         return randomStrIndex(string, existIndexes);
     }
+}
+
+bool Core::compareTables(const std::vector<std::vector<char>>& table, const std::vector<std::vector<char>>& showTable) {
+    if (table.size() != showTable.size())
+        return false;
+    for (size_t i = 0; i < table.size(); ++i) {
+        if (table[i].size() != showTable[i].size())
+            return false;
+        for (size_t j = 0; j < table[i].size(); ++j) {
+            if (table[i][j] != showTable[i][j]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void Core::menuStartCase()
+{
+    this->user_interface->drawBoadr(this->showTable);
+    do {
+        std::pair<int, int> cords(0, 0);
+        char letter;
+        this->user_interface->drawQuestions(this->words, this->usedWordsIndexes);
+        this->user_interface->drawInput();
+
+        this->getCords(cords);
+        this->user_interface->drawSelectedField(cords);
+
+        do {
+            letter = wgetch(this->user_interface->gameBoard->inputWindow);
+        } while ((letter < 'a' || letter > 'z') && letter != ' ');
+
+        this->showTable[cords.first][cords.second] = letter;
+        if (this->showTable[cords.first][cords.second] == this->table[cords.first][cords.second]){
+            this->user_interface->drawChangedBoard(this->showTable, cords, true);
+        }else {
+            this->user_interface->drawChangedBoard(this->showTable, cords, false);
+        }
+        this->user_interface->clearWindow(this->user_interface->menu->mainWindow);
+        wrefresh(this->user_interface->gameBoard->mainWindow);
+    } while (this->compareTables(this->table, this->showTable));
+
+    int k;
+    do
+    {
+        k = getch();
+        this->user_interface->drawWinWindow();
+    } while (k != 'q');
+    clear();
+    this->user_interface->menu->prevActiveItems.clear();
+    this->chngeMenuState({"play again"});
 }

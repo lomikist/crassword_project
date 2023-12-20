@@ -83,7 +83,8 @@ void Gui::drawChangedBoard(std::vector<std::vector<char>> & table, std::pair<int
     if (flag)
         wattroff(this->gameBoard->mainWindow, COLOR_PAIR(8));
     else 
-        wattroff(this->gameBoard->mainWindow, COLOR_PAIR(7));}
+        wattroff(this->gameBoard->mainWindow, COLOR_PAIR(7));
+}
 
 void Gui::drawQuestions(const std::vector<Word> & list, const std::vector<int>  &indexes) { 
     box(this->gameBoard->questWindow, '*', '*');
@@ -96,8 +97,8 @@ void Gui::drawQuestions(const std::vector<Word> & list, const std::vector<int>  
                                                 list[indexes[i]].question.c_str(),
                                                 list[indexes[i]].xCord,
                                                 list[indexes[i]].yCord,
-                                                list[indexes[i]].xCord + (list[indexes[i]].direction == "right" ? list[indexes[i]].length : 0),
-                                                list[indexes[i]].yCord + (list[indexes[i]].direction == "down" ? list[indexes[i]].length : 0)
+                                                list[indexes[i]].xCord + (list[indexes[i]].direction == "right" ? list[indexes[i]].length - 1 : 0),
+                                                list[indexes[i]].yCord + (list[indexes[i]].direction == "down" ? list[indexes[i]].length - 1 : 0) 
                 );
     }
     wrefresh(this->gameBoard->questWindow);
@@ -134,14 +135,15 @@ int Gui::detectConrtolKeys(){
 int Gui::getDecimalNumber(const std::string &turn){
     int input = 0;
     int number = 0;
-
     this->clearWindow(this->gameBoard->inputWindow);
+
     box(this->gameBoard->inputWindow, 0, 0);
+    wrefresh(this->gameBoard->inputWindow);
     do {
         input = getch();
         // take a input from user and convert it to number the case if assci code between 9 and 1.
         int j = 0;
-        if (input <= '9' && input >= '1') {
+        if (input <= '9' && input >= '0') {
             number = number * 10 + input - '0';
             if (turn == "y")
                 mvwprintw(this->gameBoard->inputWindow, 1, 1, "y - %d", number);
@@ -151,7 +153,7 @@ int Gui::getDecimalNumber(const std::string &turn){
         }
         wrefresh(this->gameBoard->inputWindow);
     } while (input != 10);
-    this->clearWindow(this->gameBoard->inputWindow);
+
     this->verHorTurn = !this->verHorTurn;
     return number == 0 ? 1 : number;
 }
@@ -176,7 +178,17 @@ void Gui::initGameBoard(int verCount, int horCount)
     this->gameBoard->mainWindow = newwin(this->gameBoard->sizes.first , this->gameBoard->sizes.second, y, x);
     this->gameBoard->questWindow = newwin(Gui::windowHeight - this->gameBoard->sizes.first - y, this->gameBoard->sizes.second, this->gameBoard->sizes.first + y, x);
     this->gameBoard->inputWindow = newwin(this->gameBoard->sizes.first, x, 1, 0);
-}   
+}
+
+void Gui::drawSelectedField(const std::pair<int, int> & cords)
+{
+    wattron(this->gameBoard->mainWindow, COLOR_PAIR(10));
+
+    mvwaddch(this->gameBoard->mainWindow, 1 + cords.first * 2, 2 + cords.second * 4, ' ');
+
+    wattroff(this->gameBoard->mainWindow, COLOR_PAIR(10));
+    wrefresh(this->gameBoard->mainWindow);
+}
 
 void Gui::clearScreen(){
     clear();
@@ -192,6 +204,7 @@ void Gui::initScreen() {
     cbreak();
     noecho();
     keypad(stdscr, true);
+    // mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
     if (!has_colors()) {
         endwin();
         printf("Bratan your teminal dose not support colors.\n");
@@ -209,6 +222,8 @@ void Gui::initScreen() {
     init_pair(7, COLOR_RED, COLOR_BLACK);
     init_pair(8, COLOR_GREEN, COLOR_BLACK);
     init_pair(9, COLOR_WHITE, COLOR_BLACK);
+    init_pair(10, COLOR_BLACK, COLOR_RED);
+
 }
 
 void Gui::changeConsoleColor(const int pairIndex) {
@@ -223,4 +238,46 @@ void Gui::changeWindowColor(const int pairIndex) {
 
 void Gui::printErrors(const std::string &error) {
     mvwprintw(this->gameBoard->inputWindow, 1, 1, error.c_str());
+}
+
+std::pair<int, int> Gui::getMouseCords(WINDOW *win){
+    std::pair <int, int> cords (0,0);
+    int ch;
+
+    do{
+        ch = wgetch(win);
+        if (ch == KEY_MOUSE) {
+            MEVENT event;
+            
+        } 
+    } while (ch != KEY_MOUSE);
+    return cords;
+}
+
+std::pair<int, int> Gui::getKeyCords() {
+    std::pair<int, int> cords(0,0);
+    do {
+        cords.second = this->getDecimalNumber("x") - 1;
+        // this->printErrors("Your entered number is bigger than count of col.");
+    } while (cords.second < 0);
+    do {
+        cords.first = this->getDecimalNumber("y") - 1;
+        // this->printErrors("Your entered number is bigger than count of row.");
+    } while (cords.first < 0);
+    return cords;
+}
+
+void Gui::drawWinWindow()
+{
+    this->clearWindow(this->gameBoard->mainWindow);
+    box(this->gameBoard->mainWindow, 0, 0);
+    mvwprintw(this->gameBoard->mainWindow, this->gameBoard->sizes.first / 3, this->gameBoard->sizes.second     / 3 - 25, "Y88b   d88P  .d88888b.  888     888      888       888 8888888 888b    888");
+    mvwprintw(this->gameBoard->mainWindow, this->gameBoard->sizes.first / 3 + 1, this->gameBoard->sizes.second / 3 - 25, " Y88b d88P  d88P   Y88b 888     888      888   o   888   888   8888b   888");
+    mvwprintw(this->gameBoard->mainWindow, this->gameBoard->sizes.first / 3 + 2, this->gameBoard->sizes.second / 3 - 25, "  Y88o88P   888     888 888     888      888  d8b  888   888   88888b  888");
+    mvwprintw(this->gameBoard->mainWindow, this->gameBoard->sizes.first / 3 + 3, this->gameBoard->sizes.second / 3 - 25, "   Y888P    888     888 888     888      888 d888b 888   888   888Y88b 888");
+    mvwprintw(this->gameBoard->mainWindow, this->gameBoard->sizes.first / 3 + 4, this->gameBoard->sizes.second / 3 - 25, "    888     888     888 888     888      888d88888b888   888   888 Y88b888");
+    mvwprintw(this->gameBoard->mainWindow, this->gameBoard->sizes.first / 3 + 5, this->gameBoard->sizes.second / 3 - 25, "    888     888     888 888     888      88888P Y88888   888   888  Y88888");
+    mvwprintw(this->gameBoard->mainWindow, this->gameBoard->sizes.first / 3 + 6, this->gameBoard->sizes.second / 3 - 25, "    888     Y88b. .d88P Y88b. .d88P      8888P   Y8888   888   888   Y8888");
+    mvwprintw(this->gameBoard->mainWindow, this->gameBoard->sizes.first / 3 + 7, this->gameBoard->sizes.second / 3 - 25, "    888       Y88888P     Y88888P        888P     Y888 8888888 888    Y888");
+    wrefresh(this->gameBoard->mainWindow);
 }
