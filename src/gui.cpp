@@ -26,7 +26,6 @@ void Gui::adjustScreenSize(){
 
 void Gui::drawMenu(int height, int width){
     box(this->menu->mainWindow, 0, 0);
-
     for (int i = 0; i < this->menu->activeItems.size(); ++i) {
         if ( &this->menu->activeItems[i] == this->menu->currentItem ) {
             mvwprintw(this->menu->mainWindow, (i + 0.5) * height / this->menu->activeItems.size(), 2, "----->");
@@ -35,7 +34,6 @@ void Gui::drawMenu(int height, int width){
             mvwprintw(this->menu->mainWindow, (i + 0.5) * height / this->menu->activeItems.size(), 2, "%s", this->menu->activeItems[i].c_str());
         }
     }
-
     wrefresh(this->menu->mainWindow);
 }
 
@@ -144,7 +142,7 @@ int Gui::detectConrtolKeys(){
 int Gui::getDecimalNumber(const std::string &turn){
     int input = 0;
     int number = 0;
-    this->clearWindow(this->gameBoard->inputWindow);
+    // this->clearWindow(this->gameBoard->inputWindow);
 
     box(this->gameBoard->inputWindow, 0, 0);
     wrefresh(this->gameBoard->inputWindow);
@@ -155,7 +153,7 @@ int Gui::getDecimalNumber(const std::string &turn){
         if (input <= '9' && input >= '0') {
             number = number * 10 + input - '0';
             if (turn == "y")
-                mvwprintw(this->gameBoard->inputWindow, 1, 1, "y - %d", number);
+                mvwprintw(this->gameBoard->inputWindow, 2, 1, "y - %d", number);
             else if (turn == "x")
                 mvwprintw(this->gameBoard->inputWindow, 1, 1, "x - %d", number);
             j++;
@@ -211,6 +209,7 @@ void Gui::initScreen() {
     initscr();
     start_color();
     cbreak();
+    curs_set(0);
     noecho();
     keypad(stdscr, true);
     mousemask(BUTTON1_CLICKED , NULL);
@@ -227,7 +226,6 @@ void Gui::initScreen() {
     init_pair(4, COLOR_WHITE, COLOR_GREEN);
     init_pair(5, COLOR_WHITE, COLOR_MAGENTA);
     init_pair(6, COLOR_WHITE, COLOR_CYAN);
-    
     init_pair(7, COLOR_RED, COLOR_BLACK);
     init_pair(8, COLOR_GREEN, COLOR_BLACK);
     init_pair(9, COLOR_WHITE, COLOR_BLACK);
@@ -271,7 +269,6 @@ std::pair<int, int> Gui::getMouseCords(){
 bool Gui::insideWindow(int x, int y, int  width, int height, std::pair<int, int> cords)
 {
     // cords (y,x)
-
     if(cords.second > x + width || cords.second < x 
     && cords.first > y + height || cords.first < y)
     {
@@ -306,4 +303,11 @@ void Gui::drawWinWindow()
     mvwprintw(this->gameBoard->mainWindow, this->gameBoard->sizes.first / 3 + 6, this->gameBoard->sizes.second / 3 - 25, "    888     Y88b. .d88P Y88b. .d88P      8888P   Y8888   888   888   Y8888");
     mvwprintw(this->gameBoard->mainWindow, this->gameBoard->sizes.first / 3 + 7, this->gameBoard->sizes.second / 3 - 25, "    888       Y88888P     Y88888P        888P     Y888 8888888 888    Y888");
     wrefresh(this->gameBoard->mainWindow);
+}
+char Gui::getLetter(){
+    char letter;
+    do {
+        letter = wgetch(this->gameBoard->inputWindow);
+    } while ((letter < 'a' || letter > 'z') && letter != ' ' && letter != 27);
+    return letter;
 }

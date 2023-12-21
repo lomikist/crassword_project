@@ -35,7 +35,7 @@ public:
     void    drawVerticalLines();
     void    drawHorizontalLines();
     void    drawWinWindow();
-
+    char    getLetter();
 
     void    initScreen();
     std::pair<int, int>  getKeyCords();

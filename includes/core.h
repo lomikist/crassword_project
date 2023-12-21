@@ -40,7 +40,7 @@ private:
     void chngeMenuState();
     bool chekcHorizontal(int);
     bool checkVertical(int);
-
+    void menuActions();
 
     bool containsElement(std::vector<int> &, int &);
     int randomStrIndex(std::string &, std::vector<int> &);
