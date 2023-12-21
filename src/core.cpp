@@ -6,7 +6,7 @@
 #include <iostream>
 #include <random>
 
-#define QUESTION_COUNT 7
+#define QUESTION_COUNT 2
 
 Core::Core(int verCount, int horCount)
 {
@@ -83,21 +83,35 @@ void Core::menuActions()
     }
     else if (*this->user_interface->menu->currentItem == "play again")
     {
-        menuStartCase();
+        this->user_interface->clearWindow(this->user_interface->gameBoard->mainWindow);
+        this->clearShowTable();
+        this->chngeMenuState({"start", "how control", "color","exit"});
+        this->menuStartCase();
     }
     else if (*this->user_interface->menu->currentItem == "console" || *this->user_interface->menu->currentItem == "window")
     {
-        user_interface->menu->colorOption = *this->user_interface->menu->currentItem;
-        chngeMenuState({"black", "red", "blue", "cyan", "green", "magenta"});
+        this->user_interface->menu->colorOption = *this->user_interface->menu->currentItem;
+        this->chngeMenuState({"black", "red", "blue", "cyan", "green", "magenta"});
     }
     else if (*this->user_interface->menu->currentItem == "mouse" || *this->user_interface->menu->currentItem == "keyboard")
     {
-        controlType = *this->user_interface->menu->currentItem;
-        chngeMenuState();
+        this->controlType = *this->user_interface->menu->currentItem;
+        this->chngeMenuState();
     }
     else
     {
-        setColor();
+        this->setColor();
+    }
+}
+
+void Core::clearShowTable()
+{
+    for (size_t i = 0; i < showTable.size(); ++i)
+    {
+        for (size_t j = 0; j < showTable[0].size(); ++j)
+        {
+            showTable[i][j] = ' ';
+        }
     }
 }
 

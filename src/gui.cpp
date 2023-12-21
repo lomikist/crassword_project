@@ -215,7 +215,7 @@ void Gui::initScreen() {
     mousemask(BUTTON1_CLICKED , NULL);
     if (!has_colors()) {
         endwin();
-        printf("Bratan your teminal dose not support colors.\n");
+        printf("Bratan your teminal dose not suppor colors.\n");
         abort();
     }
 

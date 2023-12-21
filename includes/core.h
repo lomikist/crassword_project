@@ -41,6 +41,7 @@ private:
     bool chekcHorizontal(int);
     bool checkVertical(int);
     void menuActions();
+    void clearShowTable();
 
     bool containsElement(std::vector<int> &, int &);
     int randomStrIndex(std::string &, std::vector<int> &);
